@@ -12,10 +12,27 @@ function initStandorteKarte(elementId, statuses) {
                 : standorte;
 
             var karte = L.map(elementId);
-            L.tileLayer("https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png", {
+            var kacheln = L.tileLayer("https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png", {
                 maxZoom: 17,
                 attribution: "Kartendaten: © OpenStreetMap-Mitwirkende, SRTM | Kartendarstellung: © OpenTopoMap (CC-BY-SA)"
             }).addTo(karte);
+
+            // OpenTopoMap ist ein ehrenamtlich betriebener Dienst; einzelne Kacheln
+            // schlagen gelegentlich fehl (Timeout/Überlastung). Leaflet versucht
+            // das standardmäßig nicht erneut, daher: bis zu 3x mit Verzögerung
+            // automatisch neu laden, bevor die Kachel leer bleibt.
+            kacheln.on("tileerror", function (fehler) {
+                var tile = fehler.tile;
+                var versuche = (tile.dataset.ladeversuche | 0) + 1;
+                if (versuche > 3) {
+                    return;
+                }
+                tile.dataset.ladeversuche = versuche;
+                var url = tile.src.split("?")[0];
+                setTimeout(function () {
+                    tile.src = url + "?retry=" + versuche + "-" + Date.now();
+                }, 1000 * versuche);
+            });
 
             if (gefiltert.length === 0) {
                 karte.setView([50.3, 8.5], 9);

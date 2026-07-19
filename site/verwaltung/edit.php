@@ -410,7 +410,7 @@ function feld(?array $daten, string $name, $fallback = ''): string {
             <?php endif; ?>
 
             <label for="foto_<?= $kategorie ?>">Neue Datei hochladen</label>
-            <input type="file" id="foto_<?= $kategorie ?>" name="<?= $kategorie ?>" accept="image/jpeg,image/png,image/webp" <?= $kategorie === 'weiteres' ? 'multiple' : '' ?>>
+            <input type="file" id="foto_<?= $kategorie ?>" name="<?= $kategorie === 'weiteres' ? 'weiteres[]' : $kategorie ?>" accept="image/jpeg,image/png,image/webp" <?= $kategorie === 'weiteres' ? 'multiple' : '' ?>>
 
             <label for="foto_autor_<?= $kategorie ?>">Autor/Quelle (für neue Datei<?= $kategorie === 'weiteres' ? 'en' : '' ?>)</label>
             <input type="text" id="foto_autor_<?= $kategorie ?>" name="foto_autor_<?= $kategorie ?>" placeholder="z. B. Mitglied">

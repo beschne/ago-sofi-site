@@ -88,7 +88,26 @@ schreiben muss. `deploy.sh` schließt `uploads/` per `--exclude` von der Synchro
 (siehe unten) — das Verzeichnis muss also einmalig manuell angelegt werden und bleibt danach
 unabhängig vom Deploy-Zyklus.
 
-### 7. Verwaltungs-Zugangsschutz (HTTP Basic Auth)
+### 7. Upload-Limits (nginx + PHP)
+
+Damit Foto-Uploads bis zur in `inc/upload.php` erlaubten Größe (8 MB) tatsächlich
+ankommen, müssen zwei unabhängige Limits mindestens so hoch gesetzt sein:
+
+* nginx: `client_max_body_size 10m;` (in [`deploy/nginx/sofi.agorion.de.conf`](deploy/nginx/sofi.agorion.de.conf),
+  Standard wäre 1 MB und würde mit `413 Request Entity Too Large` abbrechen, bevor die
+  Anfrage PHP überhaupt erreicht).
+* PHP (`/etc/php/8.2/fpm/php.ini`, **gemeinsame Konfiguration** des php8.2-fpm-Pools, den
+  sich diese Seite mit einer anderen auf demselben Server teilt): `upload_max_filesize = 8M`
+  und `post_max_size = 8M`. Ubuntus Standard für `upload_max_filesize` ist nur 2 MB — das
+  wurde einmalig angehoben:
+  ```bash
+  ssh cerberus@92.205.236.81 "sudo sed -i 's/^upload_max_filesize = .*/upload_max_filesize = 8M/' /etc/php/8.2/fpm/php.ini && sudo systemctl reload php8.2-fpm"
+  ```
+  Reine Erhöhung eines gemeinsamen Werts (erlaubt größere Uploads für alle Seiten auf dem
+  Pool, schränkt nichts ein) — bewusst so entschieden statt eines eigenen FPM-Pools nur für
+  diese Seite, um die Server-Konfiguration einfach zu halten.
+
+### 8. Verwaltungs-Zugangsschutz (HTTP Basic Auth)
 
 `/verwaltung/` ist über nginx `auth_basic` geschützt (nicht `.htaccess` — der Server nutzt nginx,
 das liest keine `.htaccess`-Dateien). Neuen Nutzer anlegen/Passwort ändern:

@@ -64,9 +64,8 @@ Certbot erneuert das Zertifikat automatisch per systemd-Timer im Hintergrund.
 
 ### 5. MySQL/MariaDB (`ago_sofi`)
 
-Seit der Umstellung von Airtable auf ein eigenes Backend (siehe
-[PLAN-mysql-migration.md](PLAN-mysql-migration.md)) läuft eine eigene Datenbank auf demselben
-MariaDB-Server, der auch die WordPress-Seite `andere-seite` bedient:
+Seit der Umstellung von Airtable auf ein eigenes Backend läuft eine eigene Datenbank auf
+demselben MariaDB-Server, der auch eine andere WordPress-Seite auf diesem Server bedient:
 
 ```bash
 ssh cerberus@92.205.236.81 "sudo mysql -e \"CREATE DATABASE IF NOT EXISTS ago_sofi CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci; CREATE USER IF NOT EXISTS 'ago_sofi'@'localhost' IDENTIFIED BY '<passwort>'; GRANT ALL PRIVILEGES ON ago_sofi.* TO 'ago_sofi'@'localhost'; FLUSH PRIVILEGES;\""

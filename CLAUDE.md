@@ -8,14 +8,13 @@ AG Orion – Mini-Website zur partiellen Sonnenfinsternis am **12. August 2026**
 Lokal entwickelt und veröffentlicht auf **https://sofi.agorion.de** (nginx + PHP-FPM + MariaDB).
 
 Ursprünglich als rein statische Seite mit Airtable-Embeds gebaut; seit Juli 2026 auf ein
-eigenes PHP/MySQL-Backend umgestellt (siehe [PLAN-mysql-migration.md](PLAN-mysql-migration.md)
-für Hintergrund und Architektur-Entscheidungen). Airtable wird nicht mehr verwendet.
+eigenes PHP/MySQL-Backend umgestellt. Airtable wird nicht mehr verwendet.
 
 ## Tech-Stack
 
 * PHP (Server-Templating, kein Framework, kein Build-Schritt — Dateien werden 1:1 deployt)
-* MySQL/MariaDB (eigene Datenbank `ago_sofi` auf dem Server, der auch die WordPress-Seite
-  `andere-seite` hostet — eigener DB-User, nur Rechte auf `ago_sofi`)
+* MySQL/MariaDB (eigene Datenbank `ago_sofi` auf einem Server, der auch andere Websites
+  hostet — eigener DB-User, nur Rechte auf `ago_sofi`)
 * CSS (kein Präprozessor)
 * Vanilla JavaScript
 * **Leaflet** (Kartenbibliothek), per CDN eingebunden (`unpkg.com`, mit
@@ -28,7 +27,6 @@ für Hintergrund und Architektur-Entscheidungen). Airtable wird nicht mehr verwe
 ├── CLAUDE.md
 ├── README.md
 ├── DEPLOYMENT.md
-├── PLAN-mysql-migration.md   ← Architektur-/Migrationsplan, Hintergrund
 ├── db/
 │   ├── schema.sql             (CREATE TABLE — einmalig ausgeführt)
 │   └── seed-migration.sql     (einmalige Migration der Airtable-Altdaten)
@@ -87,8 +85,7 @@ Mac aus nicht überschrieben/gelöscht werden.
 ## Datenbank
 
 Tabellen `standorte` und `standort_fotos` in der Datenbank `ago_sofi`, Schema in
-`db/schema.sql`. Feld-/Statuswerte entsprechen 1:1 der ursprünglichen Airtable-Tabelle
-(siehe PLAN-mysql-migration.md für die vollständige Zuordnung).
+`db/schema.sql`. Feld-/Statuswerte entsprechen 1:1 der ursprünglichen Airtable-Tabelle.
 
 * **Zugangsdaten** liegen auf dem Server unter `/var/www/sofi.agorion.de-secrets/db-config.php`
   — außerhalb des Webroots, außerhalb des Git-Repos, nie Teil des rsync-Deploys.
@@ -124,4 +121,4 @@ die für die Karte nötigen Felder als JSON).
 * JavaScript auf das Notwendigste beschränken (kein unnötiges Tooling, keine Abhängigkeiten)
 * Lokal im Browser testen, dabei Desktop- und Smartphone-Ansicht prüfen
 * Lokale PHP-Entwicklung gegen die echte MariaDB per SSH-Tunnel möglich (siehe
-  PLAN-mysql-migration.md) — kein lokales MySQL nötig für ein Projekt dieser Größe
+  DEPLOYMENT.md) — kein lokales MySQL nötig für ein Projekt dieser Größe

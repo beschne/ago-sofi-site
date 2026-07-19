@@ -8,7 +8,7 @@ Veröffentlicht unter https://sofi.agorion.de.
 
 HTML5, CSS, Vanilla JavaScript, PHP (Server-Templating, kein Framework) und MySQL/MariaDB.
 Standortdaten liegen in einer eigenen Datenbank und werden über `site/verwaltung/` gepflegt
-(nicht mehr über Airtable — siehe `PLAN-mysql-migration.md` für Hintergrund).
+(nicht mehr über Airtable).
 
 ## Entwicklung
 

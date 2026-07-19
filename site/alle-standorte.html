@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sicher beobachten – AG Orion Beobachtungsstandorte Sonnenfinsternis</title>
+    <title>Alle Standorte – AG Orion Beobachtungsstandorte Sonnenfinsternis</title>
     <link rel="stylesheet" href="css/style.css">
     <link rel="icon" href="https://www.agorion.de/wp-content/uploads/2016/07/cropped-ago-website-icon-32x32.png" sizes="32x32">
     <link rel="icon" href="https://www.agorion.de/wp-content/uploads/2016/07/cropped-ago-website-icon-192x192.png" sizes="192x192">
@@ -25,26 +25,31 @@
             <nav id="access">
                 <ul>
                     <li><a href="index.html">Start</a></li>
-                    <li><a href="alle-standorte.html">Alle Standorte</a></li>
-                    <li><a href="beobachten.html" class="current" aria-current="page">Sicher beobachten</a></li>
+                    <li><a href="alle-standorte.html" class="current" aria-current="page">Alle Standorte</a></li>
+                    <li><a href="beobachten.html">Sicher beobachten</a></li>
                 </ul>
             </nav>
         </header>
 
         <main>
-            <h1>Sicher beobachten</h1>
+            <h1>Alle gemeldeten Standorte</h1>
             <p>
-                Auch beim Prüfen und Besuchen möglicher Beobachtungsstandorte gilt: Die Sonne
-                niemals ohne geeigneten Schutz direkt oder durch optische Geräte betrachten.
-                Verwende ausschließlich zertifizierte SoFi-Brillen (ISO 12312-2) oder geeignete
-                Filterfolien für Fernglas und Teleskop.
+                Übersicht aller gemeldeten Standorte mit aktuellem Prüfstatus — von
+                Vorschlag über „noch zu prüfen" bis „ungeeignet". Bereits geprüfte und
+                empfohlene Standorte findest du auf der <a href="index.html">Startseite</a>.
             </p>
-            <ul>
-                <li>SoFi-Brille vor Gebrauch auf Kratzer und Beschädigungen prüfen</li>
-                <li>Fernglas und Teleskop nur mit passendem Objektivfilter verwenden</li>
-                <li>Brille nie ablegen, während optische Geräte auf die Sonne gerichtet sind</li>
-                <li>Bei Unsicherheit lieber auf indirekte Beobachtungsmethoden (z. B. Camera obscura) zurückgreifen</li>
-            </ul>
+
+            <div class="map-placeholder">Standortkarte – alle Standorte (Platzhalter)</div>
+
+            <section>
+                <h2>Alle gemeldeten Standorte</h2>
+                <iframe class="embed" src="" title="Alle gemeldeten Standorte" id="embed-alle" loading="lazy"></iframe>
+            </section>
+
+            <p>
+                Du kennst einen weiteren guten Beobachtungsstandort? Bitte melde ihn dem Vorstand,
+                damit er geprüft und gegebenenfalls hier aufgenommen werden kann.
+            </p>
         </main>
 
         <footer>
@@ -53,5 +58,8 @@
     </div>
 
     <script src="js/config.js"></script>
+    <script>
+        document.getElementById("embed-alle").src = AIRTABLE.alle;
+    </script>
 </body>
 </html>

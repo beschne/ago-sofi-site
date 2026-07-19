@@ -25,6 +25,7 @@
             <nav id="access">
                 <ul>
                     <li><a href="index.html" class="current" aria-current="page">Start</a></li>
+                    <li><a href="alle-standorte.html">Alle Standorte</a></li>
                     <li><a href="beobachten.html">Sicher beobachten</a></li>
                 </ul>
             </nav>
@@ -34,25 +35,26 @@
             <h1>Beobachtungsstandorte für die Sonnenfinsternis am 12. August 2026</h1>
             <p>
                 Als Vorbereitung auf die partielle Sonnenfinsternis am 12. August 2026 sammelt und
-                prüft die AG Orion mögliche Beobachtungsstandorte. Hier findest du bereits geprüfte
-                Standorte sowie Vorschläge, die aktuell noch geprüft werden.
+                prüft die AG Orion mögliche Beobachtungsstandorte. Hier findest du die bereits
+                geprüften und empfohlenen Standorte.
             </p>
 
-            <div class="map-placeholder">Standortkarte (Platzhalter)</div>
+            <div class="map-placeholder">Standortkarte – geprüfte Standorte (Platzhalter)</div>
 
             <section>
-                <h2>Veröffentlichte Standorte</h2>
-                <iframe class="embed" src="" title="Veröffentlichte Standorte" id="embed-standorte" loading="lazy"></iframe>
-            </section>
-
-            <section>
-                <h2>Standortvorschläge (in Prüfung)</h2>
-                <iframe class="embed" src="" title="Standortvorschläge" id="embed-vorschlaege" loading="lazy"></iframe>
+                <h2>Geprüfte Standorte</h2>
+                <p>
+                    Standorte, die bereits geprüft und für die Beobachtung empfohlen wurden
+                    (ggf. mit Einschränkungen).
+                </p>
+                <iframe class="embed" src="" title="Geprüfte Standorte" id="embed-geprueft" loading="lazy"></iframe>
             </section>
 
             <p>
                 Du kennst einen weiteren guten Beobachtungsstandort? Bitte melde ihn dem Vorstand,
-                damit er geprüft und gegebenenfalls hier aufgenommen werden kann.
+                damit er geprüft und gegebenenfalls hier aufgenommen werden kann. Eine Übersicht
+                aller gemeldeten Standorte inkl. Prüfstatus findest du unter
+                <a href="alle-standorte.html">Alle Standorte</a>.
             </p>
         </main>
 
@@ -63,8 +65,7 @@
 
     <script src="js/config.js"></script>
     <script>
-        document.getElementById("embed-standorte").src = AIRTABLE.standorte;
-        document.getElementById("embed-vorschlaege").src = AIRTABLE.vorschlaege;
+        document.getElementById("embed-geprueft").src = AIRTABLE.geprueft;
     </script>
 </body>
 </html>

@@ -103,6 +103,7 @@ $alleStatus = ['Vorschlag', 'Zu prüfen', 'Vor Ort geprüft', 'Geeignet', 'Einge
         <?php endforeach; ?>
         </tbody>
     </table>
+    <p class="admin-anzahl"><?= count($standorte) ?> Standort<?= count($standorte) === 1 ? '' : 'e' ?> angezeigt.</p>
 </div>
 </body>
 </html>

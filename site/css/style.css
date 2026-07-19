@@ -115,11 +115,24 @@ main {
     padding: 1.5rem;
 }
 
-.embed {
+/* Airtable-Interfaces zeigen eine nicht abschaltbare Kopfzeile
+   (Interface- und Seitenname). Der Wrapper schneidet sie ab, indem das
+   iframe nach oben verschoben und der Container entsprechend
+   beschnitten wird. */
+.embed-wrapper {
     width: 100%;
-    min-height: 400px;
+    height: 600px;
+    overflow: hidden;
     border: 1px solid #ddd;
     border-radius: 4px;
+}
+
+.embed {
+    display: block;
+    width: 100%;
+    height: calc(100% + 66px);
+    margin-top: -66px;
+    border: none;
 }
 
 .map-placeholder {

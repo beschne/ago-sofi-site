@@ -38,7 +38,7 @@ function ago_sofi_nav_class(string $item, string $activeNav): string {
             <nav id="access">
                 <div>
                     <ul>
-                        <li><a href="/"<?= ago_sofi_nav_class('geprueft', $activeNav) ?>>Geprüfte Standorte</a></li>
+                        <li><a href="/"<?= ago_sofi_nav_class('geprueft', $activeNav) ?>>Empfohlene Standorte</a></li>
                         <li><a href="/alle-standorte.php"<?= ago_sofi_nav_class('alle', $activeNav) ?>>Alle Standorte</a></li>
                         <li><a href="/beobachten.php"<?= ago_sofi_nav_class('beobachten', $activeNav) ?>>Sicher beobachten</a></li>
                     </ul>

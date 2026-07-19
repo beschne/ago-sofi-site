@@ -16,7 +16,7 @@ $standorte = $stmt->fetchAll();
 
 require __DIR__ . '/inc/header.php';
 ?>
-            <h1>Geprüfte Beobachtungsstandorte</h1>
+            <h1>Empfohlene Beobachtungsstandorte</h1>
             <p>
                 Als Vorbereitung auf die partielle Sonnenfinsternis am 12. August 2026 sammelt und
                 prüft die AG Orion mögliche Beobachtungsstandorte. Hier findest du die bereits
@@ -26,7 +26,7 @@ require __DIR__ . '/inc/header.php';
             <div id="karte" class="karte"></div>
 
             <section>
-                <h2>Geprüfte Standorte</h2>
+                <h2>Empfohlene Standorte</h2>
                 <p>
                     Standorte, die bereits geprüft und für die Beobachtung empfohlen wurden
                     (ggf. mit Einschränkungen).

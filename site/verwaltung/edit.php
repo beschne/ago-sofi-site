@@ -62,6 +62,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'horizontbewertung' => $_POST['horizontbewertung'] ?? '',
         'gesamtbewertung' => $_POST['gesamtbewertung'] ?? '',
         'kurze_bewertung' => trim($_POST['kurze_bewertung'] ?? ''),
+        'interne_notiz' => trim($_POST['interne_notiz'] ?? ''),
     ];
 
     if ($daten['standortname'] === '') {
@@ -80,7 +81,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $daten[$feld] = null;
         }
     }
-    foreach (['zugaenglichkeit', 'parkplatz', 'andrang_erwartet', 'sicherheitsrisiken', 'kartenlink', 'region', 'kurzbeschreibung', 'kurze_bewertung'] as $feld) {
+    foreach (['zugaenglichkeit', 'parkplatz', 'andrang_erwartet', 'sicherheitsrisiken', 'kartenlink', 'region', 'kurzbeschreibung', 'kurze_bewertung', 'interne_notiz'] as $feld) {
         if ($daten[$feld] === '') {
             $daten[$feld] = null;
         }
@@ -156,7 +157,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     kartenlink=:kartenlink, region=:region,
                     entfernung_bad_homburg_km=:entfernung_bad_homburg_km, fahrzeit_minuten=:fahrzeit_minuten,
                     horizontbewertung=:horizontbewertung, gesamtbewertung=:gesamtbewertung,
-                    kurze_bewertung=:kurze_bewertung
+                    kurze_bewertung=:kurze_bewertung, interne_notiz=:interne_notiz
                     WHERE id=:id';
             $daten['id'] = $id;
             $stmt = $pdo->prepare($sql);
@@ -361,6 +362,9 @@ function feld(?array $daten, string $name, $fallback = ''): string {
 
         <label for="kurze_bewertung">Kurze Einschätzung</label>
         <textarea id="kurze_bewertung" name="kurze_bewertung"><?= feld($bestehend, 'kurze_bewertung') ?></textarea>
+
+        <label for="interne_notiz">Interne Notiz (nie öffentlich sichtbar)</label>
+        <textarea id="interne_notiz" name="interne_notiz"><?= feld($bestehend, 'interne_notiz') ?></textarea>
 
         <h2>Fotos &amp; Grafiken</h2>
         <p class="hinweis">

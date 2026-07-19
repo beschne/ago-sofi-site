@@ -67,6 +67,7 @@ CREATE TABLE IF NOT EXISTS standorte (
     horizontbewertung TINYINT UNSIGNED,
     gesamtbewertung TINYINT UNSIGNED,
     kurze_bewertung TEXT,
+    interne_notiz TEXT,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     INDEX idx_status_veroeffentlicht (status, veroeffentlicht)

@@ -12,9 +12,14 @@ Statische Website, lokal entwickelt und veröffentlicht auf **https://sofi.agori
 * Statisches HTML5
 * CSS (kein Präprozessor)
 * Vanilla JavaScript
-* **Keine** Frameworks, **keine** Build-Tools, **keine** Datenbank, **keine** Serverlogik
+* **Keine** Build-Tools, **keine** Datenbank, **keine** Serverlogik
+* Einzige Ausnahme von "keine Frameworks": **Leaflet** (Kartenbibliothek), per CDN
+  eingebunden (`unpkg.com`, mit Subresource-Integrity-Hash), kein Build-Schritt nötig
 
-Standortdaten werden ausschließlich über **eingebettete Airtable-Views (Embed)** angezeigt — keine eigene Datenhaltung im Code.
+Standort-Listen werden ausschließlich über **eingebettete Airtable-Views (Embed)** angezeigt
+— keine eigene Datenhaltung im Code. Einzige Ausnahme: `site/js/standorte.json`, ein
+statischer Snapshot (Name, Status, Koordinaten) für die Kartenmarker — siehe
+[Kartendaten](#kartendaten).
 
 ## Projektstruktur
 
@@ -31,7 +36,9 @@ Standortdaten werden ausschließlich über **eingebettete Airtable-Views (Embed)
     ├── css/
     │   └── style.css
     ├── js/
-    │   └── config.js
+    │   ├── config.js
+    │   ├── map.js
+    │   └── standorte.json
     └── img/
 ```
 
@@ -40,8 +47,13 @@ Alles, was ausgeliefert werden soll, liegt unterhalb von `site/`. Dateien außer
 
 ## Seiten
 
-* **index.html** — Startseite: kurze Einführung, Standortkarte (Platzhalter, nur geprüfte Standorte), Liste der geprüften/empfohlenen Standorte (Status Geeignet, Eingeschränkt geeignet, Vor Ort geprüft; Airtable Embed), Hinweis dass Mitglieder weitere Standorte an den Vorstand melden können sowie Link zu `alle-standorte.html`.
-* **alle-standorte.html** — eigene Karte (Platzhalter, alle Standorte) plus Liste aller gemeldeten Standorte inkl. sichtbarem Prüfstatus (Airtable Embed), unabhängig vom Veröffentlichungs-Status.
+* **index.html** — Startseite: kurze Einführung, Leaflet-Karte mit Markern nur für geprüfte
+  Standorte (Status Geeignet, Eingeschränkt geeignet, Vor Ort geprüft), Liste derselben
+  Standorte (Airtable Embed), Hinweis dass Mitglieder weitere Standorte an den Vorstand
+  melden können sowie Link zu `alle-standorte.html`.
+* **alle-standorte.html** — eigene Leaflet-Karte mit Markern für alle gemeldeten Standorte,
+  plus Liste aller gemeldeten Standorte inkl. sichtbarem Prüfstatus (Airtable Embed),
+  unabhängig vom Veröffentlichungs-Status.
 * **beobachten.html** — Informationen zur sicheren Sonnenbeobachtung.
 * **impressum-datenschutz.html** — Impressum und Datenschutzerklärung (im Footer aller Seiten verlinkt). Es gibt aktuell **keine** Galerie-Seite; eine Galerie über ein Airtable-Embed ist für später geplant.
 
@@ -78,6 +90,26 @@ Airtable-Plan** (auf dem Free-Plan bleibt der Button „Interface teilen" inakti
 Neue Embed-Links holen: In Airtable die jeweilige Interface-Seite öffnen → **„Interface
 teilen"** → Tab **„Über Web teilen"** → Seite im Dropdown auswählen → Toggle aktivieren →
 **„Diese Seite einbetten"** → `src`-URL aus dem `<iframe>`-Code in `config.js` eintragen.
+
+## Kartendaten
+
+Die Kartenmarker (Leaflet + OpenTopoMap-Kacheln, wegen Geländeschummerung) beziehen ihre
+Koordinaten aus `site/js/standorte.json` — einem **statischen Snapshot** (Name, Status,
+Koordinaten, `veroeffentlicht`-Flag) aus der Tabelle `Standorte` in Base `app1rAWD8E6gh0Y9j`.
+
+Bewusst **kein** Live-API-Aufruf im Browser: Ein Airtable-Zugriffsschlüssel im
+öffentlichen Client-JS wäre auslesbar und würde Zugriff auf Felder erlauben, die auf der
+Website gar nicht gezeigt werden (z. B. "Interne Notiz").
+
+`site/js/map.js` liest die JSON-Datei und filtert clientseitig:
+`initStandorteKarte("karte", ["Geeignet", "Eingeschränkt geeignet", "Vor Ort geprüft"])`
+für die geprüften Standorte (index.html), `initStandorteKarte("karte", null)` für alle
+Standorte (alle-standorte.html) — die Filterlogik muss mit der der Airtable-Interface-Seiten
+übereinstimmen (siehe oben).
+
+**Snapshot aktualisieren:** Wenn sich Standorte ändern, `standorte.json` über die
+Airtable-Verbindung neu erzeugen (Felder: Standortname, Kurzbeschreibung, Status,
+Breitengrad, Laengengrad, Veroeffentlichung) und deployen — analog zu den Embed-Links.
 
 ## Gestaltung
 

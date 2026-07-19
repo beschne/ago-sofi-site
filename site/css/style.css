@@ -135,15 +135,11 @@ main {
     border: none;
 }
 
-.map-placeholder {
+.karte {
     width: 100%;
     aspect-ratio: 16 / 9;
     background: #eee;
     border-radius: 4px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--color-muted);
     margin: 1rem 0;
 }
 

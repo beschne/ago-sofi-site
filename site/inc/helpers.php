@@ -42,6 +42,11 @@ function bewertung_sonnen(?int $wert, int $max = 5): ?string {
     return str_repeat('☀', $wert) . str_repeat('○', $max - $wert);
 }
 
+// Formatiert einen Grad-Wert mit ° und Himmelsrichtung statt Vorzeichen (z. B. "50.234080°N").
+function koordinate_grad(float $wert, string $positiv, string $negativ): string {
+    return number_format(abs($wert), 6, '.', '') . '° ' . ($wert < 0 ? $negativ : $positiv);
+}
+
 function standort_zeile(array $s): string {
     $name = htmlspecialchars($s['standortname']);
     $badge = status_badge($s['status']);

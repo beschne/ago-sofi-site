@@ -114,6 +114,35 @@ werden auch auf dem Server entfernt. `site/uploads/` ist davon **ausgeschlossen*
 liegen die über das Verwaltungsformular hochgeladenen Fotos, die nur auf dem Server existieren).
 Es nutzt automatisch den dedizierten Deploy-Key.
 
+## Manuelles Backup (Datenbank + Fotos)
+
+Der Code liegt bereits vollständig in GitHub — nicht in Git (und nicht auf dem Server
+reproduzierbar) sind nur zwei Dinge: der Inhalt der Datenbank `ago_sofi` und die über die
+Verwaltung hochgeladenen Fotos unter `uploads/`. Beides lässt sich bei Bedarf **manuell**
+(kein Cronjob, keine Automatisierung) auf den Mac sichern:
+
+```bash
+./deploy/backup.sh
+```
+
+Das Skript ([`deploy/backup.sh`](deploy/backup.sh)) erstellt einen `mysqldump` von
+`ago_sofi`, lädt `uploads/` per rsync herunter und packt beides in eine Zip-Datei unter
+`~/Desktop/<Zeitstempel>-ago-sofi-backup.zip` auf dem Mac.
+
+**Bewusst nicht enthalten** (bestehen unabhängig von diesem Backup fort und sind kein
+Content-Verlustrisiko):
+
+* `/var/www/sofi.agorion.de-secrets/db-config.php` (DB-Zugangsdaten) und
+  `/etc/nginx/.htpasswd-sofi-admin` (Verwaltungs-Login) — falls der Server komplett neu
+  aufgesetzt werden müsste, würden diese ohnehin neu vergeben (siehe Einrichtung oben),
+  ein altes Passwort für einen nicht mehr existierenden Server nützt nichts.
+* TLS-Zertifikate — werden von Certbot automatisch verwaltet und bei Bedarf neu ausgestellt.
+* nginx-Konfiguration — liegt bereits versioniert unter `deploy/nginx/sofi.agorion.de.conf`.
+
+Es gibt aktuell **kein** Restore-Skript (nur Backup, wie gewünscht) — eine Wiederherstellung
+wäre der umgekehrte Weg (`mysql ago_sofi < ago_sofi.sql`, Fotos zurück nach `uploads/`
+kopieren); auf Wunsch kann das ebenfalls als Skript ergänzt werden.
+
 ## Lokale Entwicklung gegen die echte Datenbank
 
 Für PHP-Änderungen lokal testen, ohne eine eigene MySQL-Installation zu brauchen:

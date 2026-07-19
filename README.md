@@ -1,6 +1,7 @@
 # AG Orion – Sonnenfinsternis-Website
 
-Statische Mini-Website der AG Orion zur partiellen Sonnenfinsternis am 12. August 2026.
+Statische Mini-Website der AG Orion zur Vorbereitung auf die partielle Sonnenfinsternis
+am 12. August 2026: Sammeln und Prüfen möglicher Beobachtungsstandorte.
 Veröffentlicht unter https://sofi.agorion.de.
 
 ## Tech-Stack

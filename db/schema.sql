@@ -62,7 +62,8 @@ CREATE TABLE IF NOT EXISTS standorte (
         'Odenwald/Bergstraße',
         'Wetterau',
         'Vogelsberg',
-        'Rhön'
+        'Rhön',
+        'Lahn-Dill-Bergland'
     ),
     entfernung_bad_homburg_km DECIMAL(5,1),
     fahrzeit_minuten SMALLINT UNSIGNED,

@@ -154,6 +154,13 @@ main h1 {
 .badge-ungeeignet { background: #fbe0cf; color: #8a3c11; }
 .badge-nichtmehr { background: #f6d3d3; color: #7a1f1f; }
 
+/* Andrang-Tags: Skala von Blau (gering) über Gelb/Orange bis Rot (sehr hoch). */
+.andrang-sehr-gering { background: #d7e9fa; color: #14527e; }
+.andrang-gering { background: #d3f0e8; color: #106354; }
+.andrang-mittel { background: #fbf0c9; color: #7a5d05; }
+.andrang-hoch { background: #fbe0cf; color: #8a3c11; }
+.andrang-sehr-hoch { background: #f6d3d3; color: #7a1f1f; }
+
 .standorte-liste {
     margin: 1rem 0;
 }

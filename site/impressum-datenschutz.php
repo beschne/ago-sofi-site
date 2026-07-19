@@ -20,10 +20,10 @@ require __DIR__ . '/inc/header.php';
             </p>
 
             <p><strong>Verantwortlich für den Inhalt nach § 55 Abs. 2 RStV:</strong></p>
-            <p>Benno Schneider, 1. Vorsitzender</p>
+            <p>Benno Schneider, Vorsitzender</p>
 
             <p><strong>Technische Betreuung der Webseite (Webmaster):</strong></p>
-            <p>Michael Feiler (Pressewart)</p>
+            <p>Benno Schneider, Vorsitzender</p>
 
             <p><strong>Haftungsausschluss zum Inhalt</strong></p>
             <p>

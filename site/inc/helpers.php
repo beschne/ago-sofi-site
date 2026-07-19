@@ -16,6 +16,23 @@ function status_badge(string $status): string {
     return '<span class="status-badge ' . $klasse . '">' . htmlspecialchars($status) . '</span>';
 }
 
+const ANDRANG_BADGE_KLASSEN = [
+    'Sehr gering' => 'andrang-sehr-gering',
+    'Gering' => 'andrang-gering',
+    'Mittel' => 'andrang-mittel',
+    'Hoch' => 'andrang-hoch',
+    'Sehr hoch' => 'andrang-sehr-hoch',
+];
+
+// Nur für bekannte Andrang-Werte ein Tag liefern (null bei "Unbekannt"/leer).
+function andrang_badge(?string $andrang): ?string {
+    if ($andrang === null || !isset(ANDRANG_BADGE_KLASSEN[$andrang])) {
+        return null;
+    }
+    $klasse = ANDRANG_BADGE_KLASSEN[$andrang];
+    return '<span class="status-badge ' . $klasse . '">Andrang ' . htmlspecialchars(mb_strtolower($andrang, 'UTF-8')) . '</span>';
+}
+
 // Bewertungen (Horizont-, Gesamtbewertung) als Sonnen-Skala 0–5 darstellen.
 function bewertung_sonnen(?int $wert, int $max = 5): ?string {
     if ($wert === null) {
@@ -28,6 +45,7 @@ function bewertung_sonnen(?int $wert, int $max = 5): ?string {
 function standort_zeile(array $s): string {
     $name = htmlspecialchars($s['standortname']);
     $badge = status_badge($s['status']);
+    $andrangBadge = andrang_badge($s['andrang_erwartet'] ?? null) ?? '';
     $url = '/standort/' . htmlspecialchars($s['slug']);
 
     $fakten = [];
@@ -50,6 +68,7 @@ function standort_zeile(array $s): string {
         <summary>
             <span class="standort-name">{$name}</span>
             {$badge}
+            {$andrangBadge}
         </summary>
         <div class="standort-details">
             {$kurz}

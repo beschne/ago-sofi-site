@@ -66,6 +66,7 @@ require __DIR__ . '/inc/header.php';
                             koordinate_grad((float) $s['breitengrad'], 'N', 'S'),
                             $s['hoehe_meter'] !== null ? $s['hoehe_meter'] . ' m' . ($s['hoehe_vom_turm'] ? ' (vom Turm)' : '') : null,
                         ], fn($teil) => $teil !== null)),
+                        'Zuletzt vor Ort geprüft' => $s['zuletzt_vor_ort_geprueft'] !== null ? date('d.m.Y', strtotime($s['zuletzt_vor_ort_geprueft'])) : null,
                         'Horizontbewertung' => $s['horizontbewertung'] !== null ? bewertung_sonnen((int) $s['horizontbewertung']) : null,
                         'Gesamtbewertung' => $s['gesamtbewertung'] !== null ? bewertung_sonnen((int) $s['gesamtbewertung']) : null,
                     ];

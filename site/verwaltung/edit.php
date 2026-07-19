@@ -61,6 +61,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'region' => trim($_POST['region'] ?? ''),
         'entfernung_bad_homburg_km' => $_POST['entfernung_bad_homburg_km'] ?? '',
         'fahrzeit_minuten' => $_POST['fahrzeit_minuten'] ?? '',
+        'zuletzt_vor_ort_geprueft' => $_POST['zuletzt_vor_ort_geprueft'] ?? '',
         'horizontbewertung' => $_POST['horizontbewertung'] ?? '',
         'gesamtbewertung' => $_POST['gesamtbewertung'] ?? '',
         'kurze_bewertung' => trim($_POST['kurze_bewertung'] ?? ''),
@@ -83,7 +84,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $daten[$feld] = null;
         }
     }
-    foreach (['zugaenglichkeit', 'parkplatz', 'andrang_erwartet', 'sicherheitsrisiken', 'kartenlink', 'region', 'kurzbeschreibung', 'kurze_bewertung', 'interne_notiz'] as $feld) {
+    foreach (['zugaenglichkeit', 'parkplatz', 'andrang_erwartet', 'sicherheitsrisiken', 'kartenlink', 'region', 'kurzbeschreibung', 'kurze_bewertung', 'interne_notiz', 'zuletzt_vor_ort_geprueft'] as $feld) {
         if ($daten[$feld] === '') {
             $daten[$feld] = null;
         }
@@ -162,6 +163,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     andrang_erwartet=:andrang_erwartet, sicherheitsrisiken=:sicherheitsrisiken,
                     kartenlink=:kartenlink, region=:region,
                     entfernung_bad_homburg_km=:entfernung_bad_homburg_km, fahrzeit_minuten=:fahrzeit_minuten,
+                    zuletzt_vor_ort_geprueft=:zuletzt_vor_ort_geprueft,
                     horizontbewertung=:horizontbewertung, gesamtbewertung=:gesamtbewertung,
                     kurze_bewertung=:kurze_bewertung, interne_notiz=:interne_notiz
                     WHERE id=:id';
@@ -364,6 +366,9 @@ function feld(?array $daten, string $name, $fallback = ''): string {
 
         <label for="fahrzeit_minuten">Fahrzeit ab Bad Homburg (Minuten)</label>
         <input type="number" id="fahrzeit_minuten" name="fahrzeit_minuten" value="<?= feld($bestehend, 'fahrzeit_minuten') ?>">
+
+        <label for="zuletzt_vor_ort_geprueft">Zuletzt vor Ort geprüft (öffentlich sichtbar, wenn ausgefüllt)</label>
+        <input type="date" id="zuletzt_vor_ort_geprueft" name="zuletzt_vor_ort_geprueft" value="<?= feld($bestehend, 'zuletzt_vor_ort_geprueft') ?>">
 
         <label for="horizontbewertung">Horizontbewertung (0–5)</label>
         <input type="number" min="0" max="5" id="horizontbewertung" name="horizontbewertung" value="<?= feld($bestehend, 'horizontbewertung') ?>">

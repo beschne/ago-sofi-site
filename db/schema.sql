@@ -66,6 +66,7 @@ CREATE TABLE IF NOT EXISTS standorte (
     ),
     entfernung_bad_homburg_km DECIMAL(5,1),
     fahrzeit_minuten SMALLINT UNSIGNED,
+    zuletzt_vor_ort_geprueft DATE,
     horizontbewertung TINYINT UNSIGNED,
     gesamtbewertung TINYINT UNSIGNED,
     kurze_bewertung TEXT,

@@ -34,8 +34,21 @@ function initStandorteKarte(elementId, filter) {
             }
 
             var marker = standorte.map(function (standort) {
-                var popup = "<strong>" + standort.name + "</strong><br>" + standort.status +
-                    '<br><a href="/standort/' + standort.slug + '">Details</a>';
+                var popup = document.createElement("div");
+
+                var name = document.createElement("strong");
+                name.textContent = standort.name;
+                popup.appendChild(name);
+                popup.appendChild(document.createElement("br"));
+
+                popup.appendChild(document.createTextNode(standort.status));
+                popup.appendChild(document.createElement("br"));
+
+                var link = document.createElement("a");
+                link.href = "/standort/" + encodeURIComponent(standort.slug);
+                link.textContent = "Details";
+                popup.appendChild(link);
+
                 return L.marker([standort.lat, standort.lon])
                     .bindPopup(popup)
                     .addTo(karte);

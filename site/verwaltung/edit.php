@@ -102,6 +102,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!in_array($daten['region'], array_merge($regionOptionen, [null]), true)) {
         $fehler[] = 'Ungültige Region.';
     }
+    if ($daten['kartenlink'] !== null && !preg_match('#^https?://#i', $daten['kartenlink'])) {
+        $fehler[] = 'Kartenlink muss mit http:// oder https:// beginnen.';
+    }
 
     // Foto-Uploads verarbeiten (auch bei Validierungsfehlern schon prüfen, um früh Fehler zu zeigen)
     $neueFotos = []; // kategorie => [ ['dateiname'=>, 'autor_quelle'=>, 'lizenz'=>, 'aufnahme_zeitpunkt'=>, 'gps_breitengrad'=>, 'gps_laengengrad'=>], ... ]

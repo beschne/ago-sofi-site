@@ -12,6 +12,14 @@ $fotoKategorien = [
     'horizontgrafik' => 'Horizontgrafik',
     'weiteres' => 'Weitere Fotos (mehrere möglich)',
 ];
+$lizenzOptionen = [
+    'Eigenes Werk (AGO)',
+    'CC BY 4.0',
+    'CC BY-SA 4.0',
+    'CC0 / Public Domain',
+    'Freigabe durch Urheber',
+    'Sonstige',
+];
 
 $id = isset($_GET['id']) ? (int) $_GET['id'] : (isset($_POST['id']) ? (int) $_POST['id'] : null);
 $fehler = [];
@@ -74,17 +82,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     // Foto-Uploads verarbeiten (auch bei Validierungsfehlern schon prüfen, um früh Fehler zu zeigen)
-    $neueFotos = []; // kategorie => [dateiname, ...]
+    $neueFotos = []; // kategorie => [ ['dateiname'=>, 'autor_quelle'=>, 'lizenz'=>, 'aufnahme_zeitpunkt'=>, 'gps_breitengrad'=>, 'gps_laengengrad'=>], ... ]
     try {
         foreach (['horizontfoto', 'panorama', 'horizontgrafik'] as $kategorie) {
             if (!empty($_FILES[$kategorie]['name'])) {
-                $dateiname = verarbeite_foto_upload($_FILES[$kategorie]);
-                if ($dateiname) {
-                    $neueFotos[$kategorie] = [$dateiname];
+                $fotoDaten = verarbeite_foto_upload($_FILES[$kategorie]);
+                if ($fotoDaten) {
+                    $autor = trim($_POST['foto_autor_' . $kategorie] ?? '');
+                    $lizenz = $_POST['foto_lizenz_' . $kategorie] ?? '';
+                    $fotoDaten['autor_quelle'] = $autor !== '' ? $autor : null;
+                    $fotoDaten['lizenz'] = in_array($lizenz, $lizenzOptionen, true) ? $lizenz : null;
+                    $neueFotos[$kategorie] = [$fotoDaten];
                 }
             }
         }
         if (!empty($_FILES['weiteres']['name'][0])) {
+            $autorWeiteres = trim($_POST['foto_autor_weiteres'] ?? '');
+            $autorWeiteres = $autorWeiteres !== '' ? $autorWeiteres : null;
+            $lizenzWeiteresRoh = $_POST['foto_lizenz_weiteres'] ?? '';
+            $lizenzWeiteres = in_array($lizenzWeiteresRoh, $lizenzOptionen, true) ? $lizenzWeiteresRoh : null;
+
             $anzahl = count($_FILES['weiteres']['name']);
             for ($i = 0; $i < $anzahl; $i++) {
                 if ($_FILES['weiteres']['error'][$i] === UPLOAD_ERR_NO_FILE) {
@@ -97,9 +114,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     'error' => $_FILES['weiteres']['error'][$i],
                     'size' => $_FILES['weiteres']['size'][$i],
                 ];
-                $dateiname = verarbeite_foto_upload($einzelDatei);
-                if ($dateiname) {
-                    $neueFotos['weiteres'][] = $dateiname;
+                $fotoDaten = verarbeite_foto_upload($einzelDatei);
+                if ($fotoDaten) {
+                    $fotoDaten['autor_quelle'] = $autorWeiteres;
+                    $fotoDaten['lizenz'] = $lizenzWeiteres;
+                    $neueFotos['weiteres'][] = $fotoDaten;
                 }
             }
         }
@@ -147,6 +166,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
 
+        // Metadaten bestehender Fotos aktualisieren
+        if (!empty($_POST['foto_meta']) && is_array($_POST['foto_meta'])) {
+            foreach ($_POST['foto_meta'] as $fotoId => $meta) {
+                $fotoId = (int) $fotoId;
+                $autor = trim($meta['autor_quelle'] ?? '');
+                $autor = $autor !== '' ? $autor : null;
+                $lizenzRoh = $meta['lizenz'] ?? '';
+                $lizenz = in_array($lizenzRoh, $lizenzOptionen, true) ? $lizenzRoh : null;
+
+                $zeit = null;
+                $zeitRoh = trim($meta['aufnahme_zeitpunkt'] ?? '');
+                if ($zeitRoh !== '') {
+                    $dt = DateTime::createFromFormat('Y-m-d\TH:i', $zeitRoh);
+                    if ($dt !== false) {
+                        $zeit = $dt->format('Y-m-d H:i:s');
+                    }
+                }
+
+                $lat = is_numeric($meta['gps_breitengrad'] ?? '') ? (float) $meta['gps_breitengrad'] : null;
+                $lon = is_numeric($meta['gps_laengengrad'] ?? '') ? (float) $meta['gps_laengengrad'] : null;
+
+                $update = $pdo->prepare(
+                    'UPDATE standort_fotos SET autor_quelle=?, lizenz=?, aufnahme_zeitpunkt=?, gps_breitengrad=?, gps_laengengrad=?
+                     WHERE id=? AND standort_id=?'
+                );
+                $update->execute([$autor, $lizenz, $zeit, $lat, $lon, $fotoId, $id]);
+            }
+        }
+
         // Neue Fotos speichern (Einzel-Kategorien ersetzen ein evtl. vorhandenes Foto derselben Kategorie)
         foreach ($neueFotos as $kategorie => $dateien) {
             if ($kategorie !== 'weiteres') {
@@ -157,9 +205,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $pdo->prepare('DELETE FROM standort_fotos WHERE id = ?')->execute([$altesFoto['id']]);
                 }
             }
-            foreach ($dateien as $sortierung => $dateiname) {
-                $insertFoto = $pdo->prepare('INSERT INTO standort_fotos (standort_id, kategorie, dateiname, sortierung) VALUES (?, ?, ?, ?)');
-                $insertFoto->execute([$id, $kategorie, $dateiname, $sortierung]);
+            foreach ($dateien as $sortierung => $fotoDaten) {
+                $insertFoto = $pdo->prepare(
+                    'INSERT INTO standort_fotos
+                     (standort_id, kategorie, dateiname, sortierung, autor_quelle, lizenz, aufnahme_zeitpunkt, gps_breitengrad, gps_laengengrad)
+                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)'
+                );
+                $insertFoto->execute([
+                    $id, $kategorie, $fotoDaten['dateiname'], $sortierung,
+                    $fotoDaten['autor_quelle'], $fotoDaten['lizenz'],
+                    $fotoDaten['aufnahme_zeitpunkt'], $fotoDaten['gps_breitengrad'], $fotoDaten['gps_laengengrad'],
+                ]);
             }
         }
 
@@ -261,21 +317,72 @@ function feld(?array $daten, string $name, $fallback = ''): string {
         <textarea id="kurze_bewertung" name="kurze_bewertung"><?= feld($bestehend, 'kurze_bewertung') ?></textarea>
 
         <h2>Fotos &amp; Grafiken</h2>
+        <p class="hinweis">
+            Bitte keine personenbezogenen Daten bei Autor/Quelle eintragen — bei
+            AGO-Mitgliedern einfach „Mitglied" statt Name verwenden.
+        </p>
+
         <?php foreach ($fotoKategorien as $kategorie => $label): ?>
-            <label for="foto_<?= $kategorie ?>"><?= htmlspecialchars($label) ?></label>
+            <h3><?= htmlspecialchars($label) ?></h3>
+
             <?php if (!empty($fotos[$kategorie])): ?>
                 <div class="bestehende-fotos">
                     <?php foreach ($fotos[$kategorie] as $foto): ?>
-                        <label>
+                        <div class="bestehendes-foto">
                             <img src="/uploads/<?= htmlspecialchars($foto['dateiname']) ?>" alt="">
-                            <br><input type="checkbox" name="foto_loeschen[]" value="<?= (int) $foto['id'] ?>"> löschen
-                        </label>
+
+                            <label>Autor/Quelle
+                                <input type="text" name="foto_meta[<?= (int) $foto['id'] ?>][autor_quelle]" value="<?= htmlspecialchars($foto['autor_quelle'] ?? '') ?>">
+                            </label>
+
+                            <label>Lizenz
+                                <select name="foto_meta[<?= (int) $foto['id'] ?>][lizenz]">
+                                    <option value="">–</option>
+                                    <?php foreach ($lizenzOptionen as $opt): ?>
+                                        <option value="<?= htmlspecialchars($opt) ?>" <?= ($foto['lizenz'] ?? '') === $opt ? 'selected' : '' ?>><?= htmlspecialchars($opt) ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </label>
+
+                            <label>Aufnahmezeitpunkt
+                                <input type="datetime-local" name="foto_meta[<?= (int) $foto['id'] ?>][aufnahme_zeitpunkt]"
+                                       value="<?= $foto['aufnahme_zeitpunkt'] ? date('Y-m-d\TH:i', strtotime($foto['aufnahme_zeitpunkt'])) : '' ?>">
+                            </label>
+
+                            <label>GPS Breitengrad
+                                <input type="number" step="0.000001" name="foto_meta[<?= (int) $foto['id'] ?>][gps_breitengrad]" value="<?= htmlspecialchars($foto['gps_breitengrad'] ?? '') ?>">
+                            </label>
+
+                            <label>GPS Längengrad
+                                <input type="number" step="0.000001" name="foto_meta[<?= (int) $foto['id'] ?>][gps_laengengrad]" value="<?= htmlspecialchars($foto['gps_laengengrad'] ?? '') ?>">
+                            </label>
+
+                            <label><input type="checkbox" name="foto_loeschen[]" value="<?= (int) $foto['id'] ?>"> löschen</label>
+                        </div>
                     <?php endforeach; ?>
                 </div>
             <?php endif; ?>
+
+            <label for="foto_<?= $kategorie ?>">Neue Datei hochladen</label>
             <input type="file" id="foto_<?= $kategorie ?>" name="<?= $kategorie ?>" accept="image/jpeg,image/png,image/webp" <?= $kategorie === 'weiteres' ? 'multiple' : '' ?>>
+
+            <label for="foto_autor_<?= $kategorie ?>">Autor/Quelle (für neue Datei<?= $kategorie === 'weiteres' ? 'en' : '' ?>)</label>
+            <input type="text" id="foto_autor_<?= $kategorie ?>" name="foto_autor_<?= $kategorie ?>" placeholder="z. B. Mitglied">
+
+            <label for="foto_lizenz_<?= $kategorie ?>">Lizenz (für neue Datei<?= $kategorie === 'weiteres' ? 'en' : '' ?>)</label>
+            <select id="foto_lizenz_<?= $kategorie ?>" name="foto_lizenz_<?= $kategorie ?>">
+                <option value="">–</option>
+                <?php foreach ($lizenzOptionen as $opt): ?>
+                    <option value="<?= htmlspecialchars($opt) ?>"><?= htmlspecialchars($opt) ?></option>
+                <?php endforeach; ?>
+            </select>
         <?php endforeach; ?>
-        <p class="hinweis">JPG, PNG oder WebP, max. 8&nbsp;MB pro Datei.</p>
+        <p class="hinweis">
+            JPG, PNG oder WebP, max. 8&nbsp;MB pro Datei. Aufnahmezeitpunkt und
+            GPS-Koordinaten werden bei JPG-Dateien automatisch aus den EXIF-Daten
+            übernommen (falls vorhanden) und lassen sich nach dem Speichern hier
+            korrigieren.
+        </p>
 
         <div class="admin-actions">
             <button type="submit" class="btn">Speichern</button>

@@ -25,6 +25,16 @@ body {
     color: #1982d1;
 }
 
+.admin-header a.btn {
+    color: #fff;
+}
+
+.admin-header-aktionen {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
 table.admin-tabelle {
     width: 100%;
     border-collapse: collapse;
@@ -110,17 +120,44 @@ table.admin-tabelle th {
 .bestehende-fotos {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.5rem;
-    margin: 0.5rem 0;
+    gap: 0.75rem;
+    margin: 0.5rem 0 1rem;
 }
 
-.bestehende-fotos img {
-    max-width: 100px;
-    max-height: 100px;
+.bestehendes-foto {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    width: 220px;
+    padding: 0.6rem;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.bestehendes-foto img {
+    max-width: 100%;
+    max-height: 120px;
     width: auto;
     height: auto;
     object-fit: contain;
     border: 1px solid #ddd;
     border-radius: 3px;
     background: #fafafa;
+    align-self: center;
+}
+
+.bestehendes-foto label {
+    margin: 0;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.bestehendes-foto input[type=text],
+.bestehendes-foto input[type=number],
+.bestehendes-foto input[type=datetime-local],
+.bestehendes-foto select {
+    width: 100%;
+    padding: 0.3rem;
+    font-size: 0.85rem;
 }

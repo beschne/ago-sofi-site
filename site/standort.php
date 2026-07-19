@@ -90,9 +90,15 @@ require __DIR__ . '/inc/header.php';
                         <h3><?= htmlspecialchars($kategorieLabel[$kategorie] ?? $kategorie) ?></h3>
                         <div class="foto-galerie">
                             <?php foreach ($liste as $foto): ?>
-                                <a href="/uploads/<?= htmlspecialchars($foto['dateiname']) ?>" target="_blank" rel="noopener">
-                                    <img src="/uploads/<?= htmlspecialchars($foto['dateiname']) ?>" loading="lazy" alt="<?= htmlspecialchars($kategorieLabel[$kategorie] ?? $kategorie) ?> – <?= htmlspecialchars($s['standortname']) ?>">
-                                </a>
+                                <figure>
+                                    <a href="/uploads/<?= htmlspecialchars($foto['dateiname']) ?>" target="_blank" rel="noopener">
+                                        <img src="/uploads/<?= htmlspecialchars($foto['dateiname']) ?>" loading="lazy" alt="<?= htmlspecialchars($kategorieLabel[$kategorie] ?? $kategorie) ?> – <?= htmlspecialchars($s['standortname']) ?>">
+                                    </a>
+                                    <?php $credit = foto_credit($foto); ?>
+                                    <?php if ($credit !== ''): ?>
+                                        <figcaption><?= $credit ?></figcaption>
+                                    <?php endif; ?>
+                                </figure>
                             <?php endforeach; ?>
                         </div>
                     <?php endforeach; ?>

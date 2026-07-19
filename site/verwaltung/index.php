@@ -3,14 +3,27 @@ require __DIR__ . '/../inc/db.php';
 require __DIR__ . '/../inc/csrf.php';
 
 $statusFilter = $_GET['status'] ?? '';
+$veroeffentlichtFilter = $_GET['veroeffentlicht'] ?? '';
 $pdo = ago_sofi_db();
 
+$bedingungen = [];
+$parameter = [];
 if ($statusFilter !== '') {
-    $stmt = $pdo->prepare("SELECT * FROM standorte WHERE status = ? ORDER BY standortname");
-    $stmt->execute([$statusFilter]);
-} else {
-    $stmt = $pdo->query("SELECT * FROM standorte ORDER BY standortname");
+    $bedingungen[] = 'status = ?';
+    $parameter[] = $statusFilter;
 }
+if ($veroeffentlichtFilter !== '') {
+    $bedingungen[] = 'veroeffentlicht = ?';
+    $parameter[] = $veroeffentlichtFilter === 'ja' ? 1 : 0;
+}
+
+$sql = 'SELECT * FROM standorte';
+if ($bedingungen) {
+    $sql .= ' WHERE ' . implode(' AND ', $bedingungen);
+}
+$sql .= ' ORDER BY standortname';
+$stmt = $pdo->prepare($sql);
+$stmt->execute($parameter);
 $standorte = $stmt->fetchAll();
 
 $alleStatus = ['Vorschlag', 'Zu prüfen', 'Vor Ort geprüft', 'Geeignet', 'Eingeschränkt geeignet', 'Ungeeignet', 'Nicht mehr verfügbar'];
@@ -26,7 +39,10 @@ $alleStatus = ['Vorschlag', 'Zu prüfen', 'Vor Ort geprüft', 'Geeignet', 'Einge
 <div class="admin-wrap">
     <div class="admin-header">
         <h1>Standorte verwalten</h1>
-        <a href="edit.php" class="btn">+ Neuer Standort</a>
+        <div class="admin-header-aktionen">
+            <a href="bilder.php">Bilder verwalten</a>
+            <a href="edit.php" class="btn">+ Neuer Standort</a>
+        </div>
     </div>
 
     <?php if (isset($_GET['gespeichert'])): ?>
@@ -36,14 +52,24 @@ $alleStatus = ['Vorschlag', 'Zu prüfen', 'Vor Ort geprüft', 'Geeignet', 'Einge
         <p class="erfolg">Standort gelöscht.</p>
     <?php endif; ?>
 
-    <form method="get" style="margin-bottom: 1rem;">
-        <label for="status">Nach Status filtern:</label>
-        <select name="status" id="status" onchange="this.form.submit()">
-            <option value="">Alle</option>
-            <?php foreach ($alleStatus as $status): ?>
-                <option value="<?= htmlspecialchars($status) ?>" <?= $statusFilter === $status ? 'selected' : '' ?>><?= htmlspecialchars($status) ?></option>
-            <?php endforeach; ?>
-        </select>
+    <form method="get" style="margin-bottom: 1rem; display: flex; gap: 1.5rem; align-items: center;">
+        <span>
+            <label for="status">Nach Status filtern:</label>
+            <select name="status" id="status" onchange="this.form.submit()">
+                <option value="">Alle</option>
+                <?php foreach ($alleStatus as $status): ?>
+                    <option value="<?= htmlspecialchars($status) ?>" <?= $statusFilter === $status ? 'selected' : '' ?>><?= htmlspecialchars($status) ?></option>
+                <?php endforeach; ?>
+            </select>
+        </span>
+        <span>
+            <label for="veroeffentlicht">Veröffentlicht:</label>
+            <select name="veroeffentlicht" id="veroeffentlicht" onchange="this.form.submit()">
+                <option value="" <?= $veroeffentlichtFilter === '' ? 'selected' : '' ?>>Alle</option>
+                <option value="ja" <?= $veroeffentlichtFilter === 'ja' ? 'selected' : '' ?>>Ja</option>
+                <option value="nein" <?= $veroeffentlichtFilter === 'nein' ? 'selected' : '' ?>>Nein</option>
+            </select>
+        </span>
     </form>
 
     <table class="admin-tabelle">

@@ -51,6 +51,20 @@ function standort_zeile(array $s): string {
     HTML;
 }
 
+function foto_credit(array $foto): string {
+    $teile = [];
+    if (!empty($foto['autor_quelle'])) {
+        $teile[] = htmlspecialchars($foto['autor_quelle']);
+    }
+    if (!empty($foto['lizenz'])) {
+        $teile[] = htmlspecialchars($foto['lizenz']);
+    }
+    if (!empty($foto['aufnahme_zeitpunkt'])) {
+        $teile[] = date('d.m.Y', strtotime($foto['aufnahme_zeitpunkt']));
+    }
+    return implode(' &middot; ', $teile);
+}
+
 function slugify(string $text): string {
     $ersetzungen = ['ä' => 'ae', 'ö' => 'oe', 'ü' => 'ue', 'ß' => 'ss', 'Ä' => 'ae', 'Ö' => 'oe', 'Ü' => 'ue'];
     $text = strtr($text, $ersetzungen);

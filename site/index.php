@@ -22,6 +22,13 @@ require __DIR__ . '/inc/header.php';
                 prüft die AG Orion mögliche Beobachtungsstandorte. Hier findest du die bereits
                 geprüften und empfohlenen Standorte.
             </p>
+            <p>
+                <strong>Tipp:</strong> Die Sonnenfinsternis am 12. August findet kurz vor
+                Sonnenuntergang statt. Besuche deinen gewählten Beobachtungsstandort daher am besten
+                schon einige Tage vorher – idealerweise am Vorabend – zur gleichen Uhrzeit und prüfe
+                dort den Sonnenuntergang: So siehst du direkt, ob die Sicht Richtung Horizont wirklich
+                frei ist.
+            </p>
 
             <div id="karte" class="karte"></div>
 

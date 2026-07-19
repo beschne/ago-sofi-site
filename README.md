@@ -1,19 +1,20 @@
 # AG Orion – Sonnenfinsternis-Website
 
-Statische Mini-Website der AG Orion zur Vorbereitung auf die partielle Sonnenfinsternis
+Mini-Website der AG Orion zur Vorbereitung auf die partielle Sonnenfinsternis
 am 12. August 2026: Sammeln und Prüfen möglicher Beobachtungsstandorte.
 Veröffentlicht unter https://sofi.agorion.de.
 
 ## Tech-Stack
 
-Statisches HTML5, CSS, Vanilla JavaScript – keine Frameworks, keine Build-Tools.
-Standortdaten werden über eingebettete Airtable-Views angezeigt.
+HTML5, CSS, Vanilla JavaScript, PHP (Server-Templating, kein Framework) und MySQL/MariaDB.
+Standortdaten liegen in einer eigenen Datenbank und werden über `site/verwaltung/` gepflegt
+(nicht mehr über Airtable — siehe `PLAN-mysql-migration.md` für Hintergrund).
 
 ## Entwicklung
 
-Alle auszuliefernden Dateien liegen unter `site/`. Dateien direkt im Browser öffnen
-bzw. lokal ausliefern. Airtable-Embed-URLs in `site/js/config.js` eintragen (siehe
-`CLAUDE.md` für Details).
+Alle auszuliefernden Dateien liegen unter `site/`. Für lokale PHP-Entwicklung gegen die
+echte Datenbank siehe `DEPLOYMENT.md` (SSH-Tunnel-Ansatz). Details zu Seiten, Datenmodell
+und Konventionen: `CLAUDE.md`.
 
 ## Deployment
 

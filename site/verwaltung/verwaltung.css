@@ -1,0 +1,122 @@
+/* Schlanke, rein funktionale Admin-Oberfläche — keine Markenanpassung nötig. */
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    font: 15px "Helvetica Neue", Helvetica, Arial, sans-serif;
+    color: #222;
+    background: #f4f4f4;
+}
+
+.admin-wrap {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 1.5rem;
+}
+
+.admin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 1rem;
+}
+
+.admin-header a {
+    color: #1982d1;
+}
+
+table.admin-tabelle {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+}
+
+table.admin-tabelle th,
+table.admin-tabelle td {
+    text-align: left;
+    padding: 0.5rem 0.75rem;
+    border-bottom: 1px solid #ddd;
+    font-size: 0.9rem;
+}
+
+table.admin-tabelle th {
+    background: #eee;
+}
+
+.admin-form label {
+    display: block;
+    margin: 0.9rem 0 0.25rem;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.admin-form input[type=text],
+.admin-form input[type=number],
+.admin-form input[type=url],
+.admin-form select,
+.admin-form textarea {
+    width: 100%;
+    padding: 0.5rem;
+    font: inherit;
+    border: 1px solid #bbb;
+    border-radius: 3px;
+}
+
+.admin-form textarea {
+    min-height: 5em;
+}
+
+.admin-form .hinweis {
+    color: #666;
+    font-size: 0.85rem;
+}
+
+.admin-actions {
+    margin: 1.5rem 0;
+}
+
+.btn {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    border-radius: 3px;
+    border: none;
+    background: #1982d1;
+    color: #fff;
+    text-decoration: none;
+    cursor: pointer;
+    font: inherit;
+}
+
+.btn-gefahr {
+    background: #c0392b;
+}
+
+.fehler {
+    background: #fbe0cf;
+    color: #8a3c11;
+    padding: 0.75rem 1rem;
+    border-radius: 3px;
+    margin-bottom: 1rem;
+}
+
+.erfolg {
+    background: #dcf3d8;
+    color: #2c6b23;
+    padding: 0.75rem 1rem;
+    border-radius: 3px;
+    margin-bottom: 1rem;
+}
+
+.bestehende-fotos {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: 0.5rem 0;
+}
+
+.bestehende-fotos img {
+    width: 100px;
+    height: 75px;
+    object-fit: cover;
+    border-radius: 3px;
+}

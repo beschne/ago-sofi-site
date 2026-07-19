@@ -1,16 +1,10 @@
 // Initialisiert eine Leaflet-Karte mit OpenTopoMap-Kacheln und Standort-Markern.
-// statuses === null zeigt alle Standorte, sonst nur die übergebenen Status-Werte
-// (und nur veröffentlichte Standorte).
-function initStandorteKarte(elementId, statuses) {
-    fetch("js/standorte.json")
+// filter: "geprueft" (nur veröffentlichte, geprüfte/empfohlene Standorte) oder
+// "alle" (alle gemeldeten Standorte, unabhängig vom Status).
+function initStandorteKarte(elementId, filter) {
+    fetch("api/standorte.php?filter=" + encodeURIComponent(filter))
         .then(function (response) { return response.json(); })
         .then(function (standorte) {
-            var gefiltert = statuses
-                ? standorte.filter(function (s) {
-                    return s.veroeffentlicht && statuses.indexOf(s.status) !== -1;
-                })
-                : standorte;
-
             var karte = L.map(elementId);
             var kacheln = L.tileLayer("https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png", {
                 maxZoom: 17,
@@ -34,14 +28,16 @@ function initStandorteKarte(elementId, statuses) {
                 }, 1000 * versuche);
             });
 
-            if (gefiltert.length === 0) {
+            if (standorte.length === 0) {
                 karte.setView([50.3, 8.5], 9);
                 return;
             }
 
-            var marker = gefiltert.map(function (standort) {
+            var marker = standorte.map(function (standort) {
+                var popup = "<strong>" + standort.name + "</strong><br>" + standort.status +
+                    '<br><a href="/standort/' + standort.slug + '">Details</a>';
                 return L.marker([standort.lat, standort.lon])
-                    .bindPopup("<strong>" + standort.name + "</strong><br>" + standort.status)
+                    .bindPopup(popup)
                     .addTo(karte);
             });
 

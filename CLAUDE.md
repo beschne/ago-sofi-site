@@ -5,21 +5,21 @@ Diese Datei gibt Claude Code Kontext für die Arbeit in diesem Repository.
 ## Projekt
 
 AG Orion – Mini-Website zur partiellen Sonnenfinsternis am **12. August 2026**.
-Statische Website, lokal entwickelt und veröffentlicht auf **https://sofi.agorion.de** (nginx).
+Lokal entwickelt und veröffentlicht auf **https://sofi.agorion.de** (nginx + PHP-FPM + MariaDB).
+
+Ursprünglich als rein statische Seite mit Airtable-Embeds gebaut; seit Juli 2026 auf ein
+eigenes PHP/MySQL-Backend umgestellt (siehe [PLAN-mysql-migration.md](PLAN-mysql-migration.md)
+für Hintergrund und Architektur-Entscheidungen). Airtable wird nicht mehr verwendet.
 
 ## Tech-Stack
 
-* Statisches HTML5
+* PHP (Server-Templating, kein Framework, kein Build-Schritt — Dateien werden 1:1 deployt)
+* MySQL/MariaDB (eigene Datenbank `ago_sofi` auf dem Server, der auch die WordPress-Seite
+  `andere-seite` hostet — eigener DB-User, nur Rechte auf `ago_sofi`)
 * CSS (kein Präprozessor)
 * Vanilla JavaScript
-* **Keine** Build-Tools, **keine** Datenbank, **keine** Serverlogik
-* Einzige Ausnahme von "keine Frameworks": **Leaflet** (Kartenbibliothek), per CDN
-  eingebunden (`unpkg.com`, mit Subresource-Integrity-Hash), kein Build-Schritt nötig
-
-Standort-Listen werden ausschließlich über **eingebettete Airtable-Views (Embed)** angezeigt
-— keine eigene Datenhaltung im Code. Einzige Ausnahme: `site/js/standorte.json`, ein
-statischer Snapshot (Name, Status, Koordinaten) für die Kartenmarker — siehe
-[Kartendaten](#kartendaten).
+* **Leaflet** (Kartenbibliothek), per CDN eingebunden (`unpkg.com`, mit
+  Subresource-Integrity-Hash), kein Build-Schritt nötig
 
 ## Projektstruktur
 
@@ -28,99 +28,100 @@ statischer Snapshot (Name, Status, Koordinaten) für die Kartenmarker — siehe
 ├── CLAUDE.md
 ├── README.md
 ├── DEPLOYMENT.md
-└── site/                  ← wird auf den Server deployt (nginx root zeigt hierher)
-    ├── index.html
-    ├── alle-standorte.html
+├── PLAN-mysql-migration.md   ← Architektur-/Migrationsplan, Hintergrund
+├── db/
+│   ├── schema.sql             (CREATE TABLE — einmalig ausgeführt)
+│   └── seed-migration.sql     (einmalige Migration der Airtable-Altdaten)
+├── deploy/
+│   ├── deploy.sh
+│   └── nginx/sofi.agorion.de.conf
+└── site/                      ← wird auf den Server deployt (nginx root zeigt hierher)
+    ├── index.php
+    ├── alle-standorte.php
+    ├── standort.php            (Detailseite, erreichbar unter /standort/<slug>)
     ├── beobachten.html
-    ├── impressum-datenschutz.html
+    ├── impressum-datenschutz.php
+    ├── verwaltung/                  (Basic-Auth-geschützte Datenpflege)
+    │   ├── index.php
+    │   ├── edit.php
+    │   └── delete.php
+    ├── api/
+    │   └── standorte.php       (öffentliches JSON für die Karte)
+    ├── inc/
+    │   ├── db.php               (PDO-Verbindung)
+    │   ├── header.php / footer.php
+    │   ├── helpers.php
+    │   ├── csrf.php
+    │   └── upload.php
     ├── css/
     │   └── style.css
     ├── js/
-    │   ├── config.js
-    │   ├── map.js
-    │   └── standorte.json
-    └── img/
+    │   └── map.js
+    ├── img/
+    └── uploads/                (Standort-Fotos; nicht Teil des Git-Repos/Deploys)
 ```
 
 Alles, was ausgeliefert werden soll, liegt unterhalb von `site/`. Dateien außerhalb von `site/`
-(README, CLAUDE.md, Deployment-Doku etc.) landen nie auf dem Webserver, siehe `DEPLOYMENT.md`.
+(README, CLAUDE.md, Deployment-Doku, `db/`-Skripte etc.) landen nie auf dem Webserver.
+
+**`site/uploads/` ist von `deploy.sh` per `--exclude` ausgenommen** (siehe DEPLOYMENT.md) —
+Fotos entstehen direkt auf dem Server über das Verwaltungsformular und dürfen von einem Deploy vom
+Mac aus nicht überschrieben/gelöscht werden.
 
 ## Seiten
 
-* **index.html** — Startseite: kurze Einführung, Leaflet-Karte mit Markern nur für geprüfte
-  Standorte (Status Geeignet, Eingeschränkt geeignet, Vor Ort geprüft), Liste derselben
-  Standorte (Airtable Embed), Hinweis dass Mitglieder weitere Standorte an den Vorstand
-  melden können sowie Link zu `alle-standorte.html`.
-* **alle-standorte.html** — eigene Leaflet-Karte mit Markern für alle gemeldeten Standorte,
-  plus Liste aller gemeldeten Standorte inkl. sichtbarem Prüfstatus (Airtable Embed),
-  unabhängig vom Veröffentlichungs-Status.
-* **beobachten.html** — Informationen zur sicheren Sonnenbeobachtung.
-* **impressum-datenschutz.html** — Impressum und Datenschutzerklärung (im Footer aller Seiten verlinkt). Es gibt aktuell **keine** Galerie-Seite; eine Galerie über ein Airtable-Embed ist für später geplant.
+* **index.php** — Startseite: kurze Einführung, Leaflet-Karte mit Markern nur für geprüfte
+  Standorte (Status Geeignet, Eingeschränkt geeignet, Vor Ort geprüft), aufklappbare Liste
+  derselben Standorte, Link zu `alle-standorte.php`.
+* **alle-standorte.php** — eigene Leaflet-Karte mit Markern für alle gemeldeten Standorte,
+  plus aufklappbare Liste aller gemeldeten Standorte inkl. Status-Badge, unabhängig vom
+  Veröffentlichungs-Status.
+* **standort.php** (`/standort/<slug>`) — Detailseite eines einzelnen Standorts: alle Felder,
+  eigene Karte mit einzelnem Marker, Foto-/Grafik-Galerie.
+* **beobachten.php** — Informationen zur sicheren Sonnenbeobachtung (keine DB-Abfrage, nutzt
+  aber dieselben `inc/header.php`/`inc/footer.php` wie die anderen Seiten).
+* **impressum-datenschutz.php** — Impressum und Datenschutzerklärung (im Footer aller Seiten
+  verlinkt). Datenschutztext beschreibt den aktuellen Stand (eigene DB, OpenTopoMap-Kacheln,
+  keine Airtable-Einbindung mehr).
 
-## Airtable
+## Datenbank
 
-* Es werden ausschließlich öffentliche **Embed-Links** verwendet, **niemals** Share-Links.
-* Alle Embed-URLs zentral in `site/js/config.js` pflegen, z. B.:
+Tabellen `standorte` und `standort_fotos` in der Datenbank `ago_sofi`, Schema in
+`db/schema.sql`. Feld-/Statuswerte entsprechen 1:1 der ursprünglichen Airtable-Tabelle
+(siehe PLAN-mysql-migration.md für die vollständige Zuordnung).
 
-  ```javascript
-  const AIRTABLE = {
-      geprueft: "...",  // Status: Geeignet, Eingeschränkt geeignet, Vor Ort geprüft
-      alle: "..."       // alle gemeldeten Standorte inkl. Status-Spalte
-  };
-  ```
-* HTML-Seiten dürfen **keine** fest eingebetteten Airtable-URLs enthalten — immer über `config.js` referenzieren.
-
-### Woher die Embed-Links kommen
-
-Klassisches Freigeben einzelner Grid-Views ist in der aktuellen Airtable-Oberfläche nicht
-mehr zugänglich (der Basis-weite "Teilen"-Button teilt nur die gesamte Base). Die
-Embed-Links stammen stattdessen aus einer **Airtable-Interface** in der Base
-`app1rAWD8E6gh0Y9j` ("AGO SoFi-Standorte 2026"):
-
-* Interface **„Website-Einbettung"** (`pbdwrCwjWYvqUgC4w`)
-  * Seite **„Geprüfte Standorte"** — Tabelle `Standorte` (`tblLIAnUxou1SroQB`), gefiltert auf
-    `Veroeffentlichung` = angehakt **und** `Status` ist eine von Geeignet /
-    Eingeschränkt geeignet / Vor Ort geprüft.
-  * Seite **„Alle Standorte"** — dieselbe Tabelle, ungefiltert (zeigt alle Status-Werte,
-    unabhängig von `Veroeffentlichung`), mit sichtbarer Status-Spalte.
-
-Öffentliches Teilen einzelner Interface-Seiten erfordert einen **kostenpflichtigen
-Airtable-Plan** (auf dem Free-Plan bleibt der Button „Interface teilen" inaktiv).
-
-Neue Embed-Links holen: In Airtable die jeweilige Interface-Seite öffnen → **„Interface
-teilen"** → Tab **„Über Web teilen"** → Seite im Dropdown auswählen → Toggle aktivieren →
-**„Diese Seite einbetten"** → `src`-URL aus dem `<iframe>`-Code in `config.js` eintragen.
+* **Zugangsdaten** liegen auf dem Server unter `/var/www/sofi.agorion.de-secrets/db-config.php`
+  — außerhalb des Webroots, außerhalb des Git-Repos, nie Teil des rsync-Deploys.
+  `inc/db.php` bindet diese Datei per absolutem Pfad ein (Override über die Umgebungsvariable
+  `AGO_SOFI_DB_CONFIG` für lokale Entwicklung möglich).
+* **Öffentliche Filterlogik** (muss zwischen `index.php`, `alle-standorte.php` und
+  `api/standorte.php` konsistent bleiben):
+  * "Geprüft": `veroeffentlicht = 1 AND status IN ('Geeignet', 'Eingeschränkt geeignet', 'Vor Ort geprüft')`
+  * "Alle": keine Einschränkung.
+* **Verwaltungsoberfläche** (`site/verwaltung/`) für Anlegen/Bearbeiten/Löschen inkl. Foto-Upload,
+  geschützt durch nginx `auth_basic` (siehe DEPLOYMENT.md für Zugangsdaten-Verwaltung) plus
+  CSRF-Token (`inc/csrf.php`) auf allen Formularen.
 
 ## Kartendaten
 
-Die Kartenmarker (Leaflet + OpenTopoMap-Kacheln, wegen Geländeschummerung) beziehen ihre
-Koordinaten aus `site/js/standorte.json` — einem **statischen Snapshot** (Name, Status,
-Koordinaten, `veroeffentlicht`-Flag) aus der Tabelle `Standorte` in Base `app1rAWD8E6gh0Y9j`.
-
-Bewusst **kein** Live-API-Aufruf im Browser: Ein Airtable-Zugriffsschlüssel im
-öffentlichen Client-JS wäre auslesbar und würde Zugriff auf Felder erlauben, die auf der
-Website gar nicht gezeigt werden (z. B. "Interne Notiz").
-
-`site/js/map.js` liest die JSON-Datei und filtert clientseitig:
-`initStandorteKarte("karte", ["Geeignet", "Eingeschränkt geeignet", "Vor Ort geprüft"])`
-für die geprüften Standorte (index.html), `initStandorteKarte("karte", null)` für alle
-Standorte (alle-standorte.html) — die Filterlogik muss mit der der Airtable-Interface-Seiten
-übereinstimmen (siehe oben).
-
-**Snapshot aktualisieren:** Wenn sich Standorte ändern, `standorte.json` über die
-Airtable-Verbindung neu erzeugen (Felder: Standortname, Kurzbeschreibung, Status,
-Breitengrad, Laengengrad, Veroeffentlichung) und deployen — analog zu den Embed-Links.
+Leaflet + OpenTopoMap-Kacheln (wegen Geländeschummerung). `site/js/map.js` lädt die Marker
+live über `api/standorte.php?filter=geprueft|alle` (kein statischer Snapshot mehr, kein
+Client-seitiger Datenbank-/API-Zugriff — die PHP-Datei fragt serverseitig ab und liefert nur
+die für die Karte nötigen Felder als JSON).
 
 ## Gestaltung
 
 * Schlicht, schnell, responsiv (Desktop und Smartphone)
 * Erscheinungsbild möglichst nah an **agorion.de**
 * Wenige Farben, gute Lesbarkeit, Fokus auf Inhalt
+* Standort-Listen als aufklappbare Zeilen (`<details>`/`<summary>`, kein JS nötig) statt
+  Tabellen-Grid
 
 ## Konventionen für die Entwicklung
 
-* Sauberes, semantisches HTML5
+* Sauberes, semantisches HTML5, PDO mit Prepared Statements (nie String-Konkatenation für SQL)
 * CSS übersichtlich strukturiert halten
 * JavaScript auf das Notwendigste beschränken (kein unnötiges Tooling, keine Abhängigkeiten)
 * Lokal im Browser testen, dabei Desktop- und Smartphone-Ansicht prüfen
-* Ziel: eine wartungsarme, schnelle Website, deren Inhalte über Airtable-Embeds gepflegt werden können, ohne den Quellcode ändern zu müssen
+* Lokale PHP-Entwicklung gegen die echte MariaDB per SSH-Tunnel möglich (siehe
+  PLAN-mysql-migration.md) — kein lokales MySQL nötig für ein Projekt dieser Größe

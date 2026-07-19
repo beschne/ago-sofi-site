@@ -62,6 +62,45 @@ ssh cerberus@92.205.236.81 'sudo certbot --nginx -d sofi.agorion.de --non-intera
 
 Certbot erneuert das Zertifikat automatisch per systemd-Timer im Hintergrund.
 
+### 5. MySQL/MariaDB (`ago_sofi`)
+
+Seit der Umstellung von Airtable auf ein eigenes Backend (siehe
+[PLAN-mysql-migration.md](PLAN-mysql-migration.md)) läuft eine eigene Datenbank auf demselben
+MariaDB-Server, der auch die WordPress-Seite `andere-seite` bedient:
+
+```bash
+ssh cerberus@92.205.236.81 "sudo mysql -e \"CREATE DATABASE IF NOT EXISTS ago_sofi CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci; CREATE USER IF NOT EXISTS 'ago_sofi'@'localhost' IDENTIFIED BY '<passwort>'; GRANT ALL PRIVILEGES ON ago_sofi.* TO 'ago_sofi'@'localhost'; FLUSH PRIVILEGES;\""
+scp db/schema.sql db/seed-migration.sql cerberus@92.205.236.81:/tmp/
+ssh cerberus@92.205.236.81 'sudo mysql ago_sofi < /tmp/schema.sql && sudo mysql ago_sofi < /tmp/seed-migration.sql && rm /tmp/schema.sql /tmp/seed-migration.sql'
+```
+
+Zugangsdaten liegen **außerhalb** des Webroots und außerhalb des Git-Repos unter
+`/var/www/sofi.agorion.de-secrets/db-config.php` (Format siehe `site/inc/db.php`), Besitzer
+`www-data`, Modus `640` — nie committen, nie per rsync deployen.
+
+### 6. Upload-Verzeichnis für Fotos
+
+```bash
+ssh cerberus@92.205.236.81 'sudo mkdir -p /var/www/sofi.agorion.de/uploads && sudo chown www-data:www-data /var/www/sofi.agorion.de/uploads && sudo chmod 755 /var/www/sofi.agorion.de/uploads'
+```
+
+Wichtig: `www-data` (nicht `cerberus`), da PHP-FPM als `www-data` läuft und dorthin
+schreiben muss. `deploy.sh` schließt `uploads/` per `--exclude` von der Synchronisation aus
+(siehe unten) — das Verzeichnis muss also einmalig manuell angelegt werden und bleibt danach
+unabhängig vom Deploy-Zyklus.
+
+### 7. Verwaltungs-Zugangsschutz (HTTP Basic Auth)
+
+`/verwaltung/` ist über nginx `auth_basic` geschützt (nicht `.htaccess` — der Server nutzt nginx,
+das liest keine `.htaccess`-Dateien). Neuen Nutzer anlegen/Passwort ändern:
+
+```bash
+ssh cerberus@92.205.236.81 'HASH=$(openssl passwd -apr1 "<neues-passwort>"); echo "<benutzername>:$HASH" | sudo tee /etc/nginx/.htpasswd-sofi-admin > /dev/null && sudo chmod 640 /etc/nginx/.htpasswd-sofi-admin && sudo chown root:www-data /etc/nginx/.htpasswd-sofi-admin'
+```
+
+Für mehrere Zeilen (mehrere Nutzer) die Datei entsprechend mit mehreren `benutzer:hash`-Zeilen
+befüllen. Die Datei liegt außerhalb des Webroots, ist nicht Teil des Deploys.
+
 ## Deploy-Ablauf (nach jeder Änderung)
 
 Vom Mac aus, im Projektverzeichnis:
@@ -72,4 +111,21 @@ Vom Mac aus, im Projektverzeichnis:
 
 Das Skript ([`deploy/deploy.sh`](deploy/deploy.sh)) synct den Inhalt von `site/` per
 `rsync --delete` auf `/var/www/sofi.agorion.de` — Dateien, die lokal gelöscht wurden,
-werden auch auf dem Server entfernt. Es nutzt automatisch den dedizierten Deploy-Key.
+werden auch auf dem Server entfernt. `site/uploads/` ist davon **ausgeschlossen** (dort
+liegen die über das Verwaltungsformular hochgeladenen Fotos, die nur auf dem Server existieren).
+Es nutzt automatisch den dedizierten Deploy-Key.
+
+## Lokale Entwicklung gegen die echte Datenbank
+
+Für PHP-Änderungen lokal testen, ohne eine eigene MySQL-Installation zu brauchen:
+
+```bash
+ssh -f -N -L 13306:127.0.0.1:3306 -i ~/.ssh/ago-sofi-deploy cerberus@92.205.236.81
+```
+
+Dann `site/inc/db.php` per Umgebungsvariable `AGO_SOFI_DB_CONFIG` auf eine lokale Config
+zeigen lassen, die denselben Host/User/Passwort wie die Server-Config nutzt, aber
+`127.0.0.1:13306` als Host angibt. Die eigentlichen Zugangsdaten dafür **nicht lokal
+speichern** — stattdessen bevorzugt direkt auf dem Server mit `php -S` (als `www-data` via
+`sudo -u www-data`) gegen die echte Config testen und nur die HTTP-Antworten per SSH-Tunnel
+lokal ansehen; so verlässt das DB-Passwort den Server nie.

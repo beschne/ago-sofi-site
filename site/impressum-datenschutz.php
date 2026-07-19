@@ -1,39 +1,8 @@
-<!DOCTYPE html>
-<html lang="de">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Impressum / Datenschutz – AG Orion Sonnenfinsternis</title>
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="icon" href="https://www.agorion.de/wp-content/uploads/2016/07/cropped-ago-website-icon-32x32.png" sizes="32x32">
-    <link rel="icon" href="https://www.agorion.de/wp-content/uploads/2016/07/cropped-ago-website-icon-192x192.png" sizes="192x192">
-    <link rel="apple-touch-icon" href="https://www.agorion.de/wp-content/uploads/2016/07/cropped-ago-website-icon-180x180.png">
-</head>
-<body>
-    <div id="page">
-        <header id="branding">
-            <h1 id="site-title"><a href="index.html">AG Orion – Sonnenfinsternis 2026</a></h1>
-            <p id="site-description">Beobachtungsstandorte für die partielle Sonnenfinsternis am 12. August 2026</p>
-            <a href="index.html" class="branding-image">
-                <img src="https://www.agorion.de/wp-content/uploads/2016/07/milky-way-logo.jpg"
-                     srcset="https://www.agorion.de/wp-content/uploads/2016/07/milky-way-logo-300x63.jpg 300w,
-                             https://www.agorion.de/wp-content/uploads/2016/07/milky-way-logo-768x162.jpg 768w,
-                             https://www.agorion.de/wp-content/uploads/2016/07/milky-way-logo.jpg 940w"
-                     sizes="(max-width: 940px) 100vw, 940px"
-                     width="940" height="198" alt="Astronomische Gesellschaft Orion" loading="lazy">
-            </a>
-            <nav id="access">
-                <div>
-                    <ul>
-                        <li><a href="index.html">Geprüfte Standorte</a></li>
-                        <li><a href="alle-standorte.html">Alle Standorte</a></li>
-                        <li><a href="beobachten.html">Sicher beobachten</a></li>
-                    </ul>
-                </div>
-            </nav>
-        </header>
-
-        <main>
+<?php
+$title = 'Impressum / Datenschutz – AG Orion Sonnenfinsternis';
+$activeNav = '';
+require __DIR__ . '/inc/header.php';
+?>
             <h1>Impressum</h1>
 
             <p>
@@ -161,18 +130,25 @@
                 Daten zu dem Zweck, Rückschlüsse auf Ihre Person zu ziehen.
             </p>
 
-            <p><strong>d) Eingebettete Inhalte von Airtable</strong></p>
+            <p><strong>d) Standortdaten</strong></p>
             <p>
-                Die Standortlisten auf dieser Website werden nicht selbst gehostet, sondern über
-                eingebettete Ansichten (Embeds) des Anbieters Airtable, Inc. eingebunden
-                (iframe-Einbindung). Beim Laden dieser Seiten wird eine Verbindung zu den Servern von
-                Airtable aufgebaut; dabei können technisch bedingt Daten wie Ihre IP-Adresse,
-                Browser-Informationen und der Zeitpunkt des Aufrufs an Airtable übertragen und dort
-                verarbeitet werden. Wir haben keinen Einfluss auf Umfang und weitere Verwendung dieser
-                Daten durch Airtable. Rechtsgrundlage ist unser berechtigtes Interesse an einer
-                einfachen, wartungsarmen Darstellung der Standort-Daten (Art. 6 Abs. 1 lit. f DSGVO).
-                Informationen zum Datenschutz bei Airtable finden Sie unter
-                <a href="https://www.airtable.com/privacy" target="_blank" rel="noopener noreferrer">airtable.com/privacy</a>.
+                Die Standortlisten und -karten auf dieser Website werden vollständig von unserem
+                eigenen Server ausgeliefert; es werden keine Inhalte Dritter (z. B. per iframe)
+                eingebunden, und es findet keine Datenübertragung an externe Anbieter zur Anzeige
+                dieser Inhalte statt. Für die Kartendarstellung wird Kartenmaterial von OpenTopoMap
+                (basierend auf OpenStreetMap-Daten) direkt im Browser nachgeladen; dabei kann
+                technisch bedingt Ihre IP-Adresse an die Server von OpenTopoMap übermittelt werden.
+                Rechtsgrundlage ist unser berechtigtes Interesse an einer anschaulichen
+                Kartendarstellung (Art. 6 Abs. 1 lit. f DSGVO).
+            </p>
+
+            <p><strong>e) Meldung und Pflege von Standorten</strong></p>
+            <p>
+                Wer einen Beobachtungsstandort meldet oder die Standortdaten in unserer internen
+                Verwaltungsoberfläche pflegt, wird von uns nicht personenbezogen erfasst: Die
+                Datenbank speichert zu jedem Standort ausschließlich Sachdaten (Name,
+                Beschreibung, Koordinaten, Status etc.), aber keine Kennung der meldenden oder
+                bearbeitenden Person.
             </p>
 
             <p><strong>3. Weitergabe personenbezogener Daten</strong></p>
@@ -183,13 +159,7 @@
 
             <p><strong>4. Verwendung von Cookies</strong></p>
             <p>
-                Diese Webseite selbst setzt keine eigenen Cookies. Die eingebundenen Airtable-Embeds
-                (siehe Ziffer 2 d) können jedoch technisch bedingt Cookies des Anbieters Airtable
-                setzen. Sie können Ihren Browser so einstellen, dass Sie über das Setzen von Cookies
-                informiert werden und Cookies nur im Einzelfall erlauben, die Annahme von Cookies für
-                bestimmte Fälle oder generell ausschließen sowie das automatische Löschen der Cookies
-                beim Schließen des Browsers aktivieren. Bei der Deaktivierung von Cookies kann die
-                Funktionalität dieser Website eingeschränkt sein.
+                Diese Webseite selbst setzt keine eigenen Cookies.
             </p>
 
             <p><strong>5. Bestehen einer automatischen Entscheidungsfindung / Profiling</strong></p>
@@ -273,11 +243,4 @@
             </p>
 
             <p>Stand: Juli 2026</p>
-        </main>
-
-        <footer>
-            &copy; 2026 AG Orion &middot; <a href="impressum-datenschutz.html">Impressum / Datenschutz</a>
-        </footer>
-    </div>
-</body>
-</html>
+<?php require __DIR__ . '/inc/footer.php';

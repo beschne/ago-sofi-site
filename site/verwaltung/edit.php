@@ -20,6 +20,11 @@ $lizenzOptionen = [
     'Freigabe durch Urheber',
     'Sonstige',
 ];
+$regionOptionen = ['Vordertaunus', 'Hintertaunus', 'Wetterau-Rand', 'Odenwald/Bergstraße', 'Wetterau', 'Vogelsberg', 'Rhön'];
+$zugaenglichkeitOptionen = ['Jederzeit frei zugänglich', 'Tagsüber frei zugänglich', 'Nur zu Fuß erreichbar', 'Genehmigung erforderlich', 'Privatgelände', 'Gesperrt', 'Unbekannt'];
+$parkplatzOptionen = ['Direkt am Standort', '< 100 m', '100 - 500m', '> 500m', 'Kein Parkplatz', 'Unbekannt'];
+$andrangOptionen = ['Sehr gering', 'Gering', 'Mittel', 'Hoch', 'Sehr hoch', 'Unbekannt'];
+$sicherheitsrisikenOptionen = ['Keine bekannt', 'Gering', 'Mittel', 'Hoch', 'Nicht bewertet'];
 
 $id = isset($_GET['id']) ? (int) $_GET['id'] : (isset($_POST['id']) ? (int) $_POST['id'] : null);
 $fehler = [];
@@ -54,7 +59,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'region' => trim($_POST['region'] ?? ''),
         'entfernung_bad_homburg_km' => $_POST['entfernung_bad_homburg_km'] ?? '',
         'fahrzeit_minuten' => $_POST['fahrzeit_minuten'] ?? '',
-        'horizontbewertung' => trim($_POST['horizontbewertung'] ?? ''),
+        'horizontbewertung' => $_POST['horizontbewertung'] ?? '',
         'gesamtbewertung' => $_POST['gesamtbewertung'] ?? '',
         'kurze_bewertung' => trim($_POST['kurze_bewertung'] ?? ''),
     ];
@@ -70,15 +75,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     // Numerische Leerfelder als NULL statt leerem String behandeln
-    foreach (['entfernung_bad_homburg_km', 'fahrzeit_minuten', 'gesamtbewertung'] as $feld) {
+    foreach (['entfernung_bad_homburg_km', 'fahrzeit_minuten', 'horizontbewertung', 'gesamtbewertung'] as $feld) {
         if ($daten[$feld] === '') {
             $daten[$feld] = null;
         }
     }
-    foreach (['zugaenglichkeit', 'parkplatz', 'andrang_erwartet', 'sicherheitsrisiken', 'kartenlink', 'region', 'horizontbewertung', 'kurzbeschreibung', 'kurze_bewertung'] as $feld) {
+    foreach (['zugaenglichkeit', 'parkplatz', 'andrang_erwartet', 'sicherheitsrisiken', 'kartenlink', 'region', 'kurzbeschreibung', 'kurze_bewertung'] as $feld) {
         if ($daten[$feld] === '') {
             $daten[$feld] = null;
         }
+    }
+
+    if (!in_array($daten['zugaenglichkeit'], array_merge($zugaenglichkeitOptionen, [null]), true)) {
+        $fehler[] = 'Ungültige Zugänglichkeit.';
+    }
+    if (!in_array($daten['parkplatz'], array_merge($parkplatzOptionen, [null]), true)) {
+        $fehler[] = 'Ungültiger Parkplatz.';
+    }
+    if (!in_array($daten['andrang_erwartet'], array_merge($andrangOptionen, [null]), true)) {
+        $fehler[] = 'Ungültiger erwarteter Andrang.';
+    }
+    if (!in_array($daten['sicherheitsrisiken'], array_merge($sicherheitsrisikenOptionen, [null]), true)) {
+        $fehler[] = 'Ungültige Sicherheitsrisiken.';
+    }
+    if (!in_array($daten['region'], array_merge($regionOptionen, [null]), true)) {
+        $fehler[] = 'Ungültige Region.';
     }
 
     // Foto-Uploads verarbeiten (auch bei Validierungsfehlern schon prüfen, um früh Fehler zu zeigen)
@@ -284,19 +305,44 @@ function feld(?array $daten, string $name, $fallback = ''): string {
         <input type="text" id="laengengrad" name="laengengrad" required value="<?= feld($bestehend, 'laengengrad') ?>">
 
         <label for="region">Region</label>
-        <input type="text" id="region" name="region" value="<?= feld($bestehend, 'region') ?>">
+        <select id="region" name="region">
+            <option value="">–</option>
+            <?php foreach ($regionOptionen as $opt): ?>
+                <option value="<?= htmlspecialchars($opt) ?>" <?= ($bestehend['region'] ?? '') === $opt ? 'selected' : '' ?>><?= htmlspecialchars($opt) ?></option>
+            <?php endforeach; ?>
+        </select>
 
         <label for="zugaenglichkeit">Zugänglichkeit</label>
-        <input type="text" id="zugaenglichkeit" name="zugaenglichkeit" value="<?= feld($bestehend, 'zugaenglichkeit') ?>">
+        <select id="zugaenglichkeit" name="zugaenglichkeit">
+            <option value="">–</option>
+            <?php foreach ($zugaenglichkeitOptionen as $opt): ?>
+                <option value="<?= htmlspecialchars($opt) ?>" <?= ($bestehend['zugaenglichkeit'] ?? '') === $opt ? 'selected' : '' ?>><?= htmlspecialchars($opt) ?></option>
+            <?php endforeach; ?>
+        </select>
 
         <label for="parkplatz">Parkplatz</label>
-        <input type="text" id="parkplatz" name="parkplatz" value="<?= feld($bestehend, 'parkplatz') ?>">
+        <select id="parkplatz" name="parkplatz">
+            <option value="">–</option>
+            <?php foreach ($parkplatzOptionen as $opt): ?>
+                <option value="<?= htmlspecialchars($opt) ?>" <?= ($bestehend['parkplatz'] ?? '') === $opt ? 'selected' : '' ?>><?= htmlspecialchars($opt) ?></option>
+            <?php endforeach; ?>
+        </select>
 
         <label for="andrang_erwartet">Erwarteter Andrang</label>
-        <input type="text" id="andrang_erwartet" name="andrang_erwartet" value="<?= feld($bestehend, 'andrang_erwartet') ?>">
+        <select id="andrang_erwartet" name="andrang_erwartet">
+            <option value="">–</option>
+            <?php foreach ($andrangOptionen as $opt): ?>
+                <option value="<?= htmlspecialchars($opt) ?>" <?= ($bestehend['andrang_erwartet'] ?? '') === $opt ? 'selected' : '' ?>><?= htmlspecialchars($opt) ?></option>
+            <?php endforeach; ?>
+        </select>
 
         <label for="sicherheitsrisiken">Sicherheitsrisiken</label>
-        <input type="text" id="sicherheitsrisiken" name="sicherheitsrisiken" value="<?= feld($bestehend, 'sicherheitsrisiken') ?>">
+        <select id="sicherheitsrisiken" name="sicherheitsrisiken">
+            <option value="">–</option>
+            <?php foreach ($sicherheitsrisikenOptionen as $opt): ?>
+                <option value="<?= htmlspecialchars($opt) ?>" <?= ($bestehend['sicherheitsrisiken'] ?? '') === $opt ? 'selected' : '' ?>><?= htmlspecialchars($opt) ?></option>
+            <?php endforeach; ?>
+        </select>
 
         <label for="kartenlink">Kartenlink (URL)</label>
         <input type="url" id="kartenlink" name="kartenlink" value="<?= feld($bestehend, 'kartenlink') ?>">
@@ -307,8 +353,8 @@ function feld(?array $daten, string $name, $fallback = ''): string {
         <label for="fahrzeit_minuten">Fahrzeit ab Bad Homburg (Minuten)</label>
         <input type="number" id="fahrzeit_minuten" name="fahrzeit_minuten" value="<?= feld($bestehend, 'fahrzeit_minuten') ?>">
 
-        <label for="horizontbewertung">Horizontbewertung</label>
-        <input type="text" id="horizontbewertung" name="horizontbewertung" value="<?= feld($bestehend, 'horizontbewertung') ?>">
+        <label for="horizontbewertung">Horizontbewertung (0–5)</label>
+        <input type="number" min="0" max="5" id="horizontbewertung" name="horizontbewertung" value="<?= feld($bestehend, 'horizontbewertung') ?>">
 
         <label for="gesamtbewertung">Gesamtbewertung (1–5)</label>
         <input type="number" min="1" max="5" id="gesamtbewertung" name="gesamtbewertung" value="<?= feld($bestehend, 'gesamtbewertung') ?>">

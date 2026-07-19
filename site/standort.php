@@ -61,8 +61,8 @@ require __DIR__ . '/inc/header.php';
                         'Sicherheitsrisiken' => $s['sicherheitsrisiken'],
                         'Entfernung ab Bad Homburg' => $s['entfernung_bad_homburg_km'] !== null ? number_format((float) $s['entfernung_bad_homburg_km'], 1, ',', '.') . ' km' : null,
                         'Fahrzeit ab Bad Homburg' => $s['fahrzeit_minuten'] !== null ? $s['fahrzeit_minuten'] . ' min' : null,
-                        'Horizontbewertung' => $s['horizontbewertung'],
-                        'Gesamtbewertung' => $s['gesamtbewertung'] !== null ? str_repeat('★', (int) $s['gesamtbewertung']) . str_repeat('☆', 5 - (int) $s['gesamtbewertung']) : null,
+                        'Horizontbewertung' => $s['horizontbewertung'] !== null ? bewertung_sonnen((int) $s['horizontbewertung']) : null,
+                        'Gesamtbewertung' => $s['gesamtbewertung'] !== null ? bewertung_sonnen((int) $s['gesamtbewertung']) : null,
                     ];
                     foreach ($zeilen as $label => $wert):
                         if ($wert === null || $wert === '') continue;

@@ -20,15 +20,51 @@ CREATE TABLE IF NOT EXISTS standorte (
     veroeffentlicht TINYINT(1) NOT NULL DEFAULT 0,
     breitengrad DECIMAL(9,6) NOT NULL,
     laengengrad DECIMAL(9,6) NOT NULL,
-    zugaenglichkeit VARCHAR(100),
-    parkplatz VARCHAR(100),
-    andrang_erwartet VARCHAR(100),
-    sicherheitsrisiken VARCHAR(100),
+    zugaenglichkeit ENUM(
+        'Jederzeit frei zugänglich',
+        'Tagsüber frei zugänglich',
+        'Nur zu Fuß erreichbar',
+        'Genehmigung erforderlich',
+        'Privatgelände',
+        'Gesperrt',
+        'Unbekannt'
+    ),
+    parkplatz ENUM(
+        'Direkt am Standort',
+        '< 100 m',
+        '100 - 500m',
+        '> 500m',
+        'Kein Parkplatz',
+        'Unbekannt'
+    ),
+    andrang_erwartet ENUM(
+        'Sehr gering',
+        'Gering',
+        'Mittel',
+        'Hoch',
+        'Sehr hoch',
+        'Unbekannt'
+    ),
+    sicherheitsrisiken ENUM(
+        'Keine bekannt',
+        'Gering',
+        'Mittel',
+        'Hoch',
+        'Nicht bewertet'
+    ),
     kartenlink VARCHAR(500),
-    region VARCHAR(100),
+    region ENUM(
+        'Vordertaunus',
+        'Hintertaunus',
+        'Wetterau-Rand',
+        'Odenwald/Bergstraße',
+        'Wetterau',
+        'Vogelsberg',
+        'Rhön'
+    ),
     entfernung_bad_homburg_km DECIMAL(5,1),
     fahrzeit_minuten SMALLINT UNSIGNED,
-    horizontbewertung VARCHAR(100),
+    horizontbewertung TINYINT UNSIGNED,
     gesamtbewertung TINYINT UNSIGNED,
     kurze_bewertung TEXT,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,

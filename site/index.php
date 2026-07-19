@@ -16,7 +16,7 @@ $standorte = $stmt->fetchAll();
 
 require __DIR__ . '/inc/header.php';
 ?>
-            <h1>Beobachtungsstandorte für die Sonnenfinsternis am 12. August 2026</h1>
+            <h1>Geprüfte Beobachtungsstandorte</h1>
             <p>
                 Als Vorbereitung auf die partielle Sonnenfinsternis am 12. August 2026 sammelt und
                 prüft die AG Orion mögliche Beobachtungsstandorte. Hier findest du die bereits

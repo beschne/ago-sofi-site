@@ -16,6 +16,15 @@ function status_badge(string $status): string {
     return '<span class="status-badge ' . $klasse . '">' . htmlspecialchars($status) . '</span>';
 }
 
+// Bewertungen (Horizont-, Gesamtbewertung) als Sonnen-Skala 0–5 darstellen.
+function bewertung_sonnen(?int $wert, int $max = 5): ?string {
+    if ($wert === null) {
+        return null;
+    }
+    $wert = max(0, min($max, $wert));
+    return str_repeat('☀', $wert) . str_repeat('○', $max - $wert);
+}
+
 function standort_zeile(array $s): string {
     $name = htmlspecialchars($s['standortname']);
     $badge = status_badge($s['status']);

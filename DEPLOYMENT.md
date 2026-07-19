@@ -1,83 +1,75 @@
 # Deployment
 
-Die Website wird über das private GitHub-Repo `beschne/ago-sofi-site` auf den Server
-ausgerollt. Nur der Inhalt von `site/` wird tatsächlich ausgeliefert — `README.md`,
-`CLAUDE.md`, `DEPLOYMENT.md` etc. liegen zwar mit im Repo-Checkout auf dem Server,
-sind aber über nginx nicht erreichbar, da `root` gezielt auf `site/` zeigt.
+Die Website wird **direkt vom lokalen Mac aus per rsync** auf den Server ausgerollt.
+Es liegt kein Git-Checkout auf dem Server — nur der Inhalt von `site/` landet dort,
+unter `/var/www/sofi.agorion.de`.
 
-## Einmalige Einrichtung auf dem Server
+* Server: `92.205.236.81` (reverse DNS: `81.236.205.92.host.secureserver.net`)
+* SSH-User: `cerberus`
+* Zielverzeichnis: `/var/www/sofi.agorion.de` (entspricht 1:1 dem Inhalt von `site/`)
+* nginx-`root` zeigt direkt auf dieses Verzeichnis
 
-### 1. Deploy-Key erzeugen (Repo ist privat, braucht eigenen Lesezugriff)
+## Einmalige Einrichtung (bereits erledigt)
 
-Auf dem Server einen dedizierten, unbeschützten SSH-Key nur für dieses Repo anlegen:
+### 1. Dedizierter SSH-Key für den Deploy-Zugriff
 
-```bash
-ssh-keygen -t ed25519 -f ~/.ssh/ago-sofi-site-deploy -N "" -C "deploy@sofi.agorion.de"
-```
-
-Den öffentlichen Schlüssel ausgeben und kopieren:
+Lokal auf dem Mac erzeugt (nicht der persönliche Key):
 
 ```bash
-cat ~/.ssh/ago-sofi-site-deploy.pub
+ssh-keygen -t ed25519 -f ~/.ssh/ago-sofi-deploy -N "" -C "deploy@sofi.agorion.de"
 ```
 
-Dann in GitHub unter **github.com/beschne/ago-sofi-site → Settings → Deploy keys →
-Add deploy key** einfügen. "Allow write access" **nicht** aktivieren (Read-only reicht
-zum Pullen).
+Der öffentliche Schlüssel liegt in `~/.ssh/ago-sofi-deploy.pub` auf dem Mac und ist als
+einziger Eintrag in `~/.ssh/authorized_keys` von `cerberus` auf dem Server hinterlegt.
 
-### 2. SSH so konfigurieren, dass `git clone`/`pull` diesen Key benutzt
-
-In `~/.ssh/config` auf dem Server:
-
-```
-Host github.com-ago-sofi-site
-    HostName github.com
-    User git
-    IdentityFile ~/.ssh/ago-sofi-site-deploy
-    IdentitiesOnly yes
-```
-
-### 3. Repo klonen
+### 2. Zielverzeichnis auf dem Server
 
 ```bash
-git clone git@github.com-ago-sofi-site:beschne/ago-sofi-site.git /var/www/sofi.agorion.de
+sudo mkdir -p /var/www/sofi.agorion.de
+sudo chown cerberus:cerberus /var/www/sofi.agorion.de
+sudo chmod 755 /var/www/sofi.agorion.de
 ```
 
-### 4. nginx `root` auf das `site/`-Unterverzeichnis zeigen lassen
+### 3. nginx-Konfiguration
 
-```nginx
-server {
-    server_name sofi.agorion.de;
-    root /var/www/sofi.agorion.de/site;
-    index index.html;
-}
-```
+Die aktive Konfiguration liegt im Projekt unter
+[`deploy/nginx/sofi.agorion.de.conf`](deploy/nginx/sofi.agorion.de.conf) und ist 1:1 die
+Datei, die auf dem Server unter `/etc/nginx/sites-available/sofi.agorion.de` liegt
+(inkl. der von Certbot ergänzten TLS-/Redirect-Blöcke).
 
-Falls für `sofi.agorion.de` noch kein TLS-Zertifikat existiert, z. B. per Certbot
-einrichten (`certbot --nginx -d sofi.agorion.de`) — abhängig davon, wie die anderen
-agorion.de-Subdomains auf diesem Server bereits abgesichert sind.
-
-### 5. nginx-Konfiguration testen und neu laden
+**Wichtig:** Wird die Konfiguration auf dem Server geändert (z. B. durch eine
+Certbot-Zertifikatserneuerung mit Anpassungen, oder manuell), muss diese Datei im Projekt
+entsprechend nachgezogen werden — und umgekehrt: Änderungen hier werden per
 
 ```bash
-nginx -t && systemctl reload nginx
+scp deploy/nginx/sofi.agorion.de.conf cerberus@92.205.236.81:/tmp/sofi.agorion.de.conf
+ssh cerberus@92.205.236.81 'sudo mv /tmp/sofi.agorion.de.conf /etc/nginx/sites-available/sofi.agorion.de && sudo chown root:root /etc/nginx/sites-available/sofi.agorion.de && sudo nginx -t && sudo systemctl reload nginx'
 ```
 
-## Deploy-Ablauf (nach jedem Push)
-
-Auf dem Server im Repo-Verzeichnis:
+auf den Server übertragen. Aktivierung erfolgte einmalig über:
 
 ```bash
-cd /var/www/sofi.agorion.de
-git pull
+ssh cerberus@92.205.236.81 'sudo ln -sf /etc/nginx/sites-available/sofi.agorion.de /etc/nginx/sites-enabled/sofi.agorion.de'
 ```
 
-Da `root` bereits auf `site/` zeigt, sind Änderungen sofort live — kein zusätzlicher
-Kopier-Schritt nötig, kein `systemctl reload` erforderlich, da sich nur statische
-Dateien ändern.
+### 4. TLS-Zertifikat (Let's Encrypt / Certbot)
 
-## Später: alternative Deploy-Variante
+Einmalig eingerichtet, analog zu den anderen Subdomains auf diesem Server:
 
-Statt `git pull` auf dem Server kann später auch lokal per `rsync`/`scp` nur der
-Inhalt von `site/` auf den Server kopiert werden (kein `.git`, keine Doku-Dateien
-auf dem Server). Diese Variante ist noch nicht eingerichtet.
+```bash
+ssh cerberus@92.205.236.81 'sudo certbot --nginx -d sofi.agorion.de --non-interactive --agree-tos -m benno.schneider@gmail.com --redirect'
+```
+
+Certbot erneuert das Zertifikat automatisch per systemd-Timer im Hintergrund.
+
+## Deploy-Ablauf (nach jeder Änderung)
+
+Vom Mac aus, im Projektverzeichnis:
+
+```bash
+./deploy/deploy.sh
+```
+
+Das Skript ([`deploy/deploy.sh`](deploy/deploy.sh)) synct den Inhalt von `site/` per
+`rsync --delete` auf `/var/www/sofi.agorion.de` — Dateien, die lokal gelöscht wurden,
+werden auch auf dem Server entfernt. Es nutzt automatisch den dedizierten Deploy-Key.

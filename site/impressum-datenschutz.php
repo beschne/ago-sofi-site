@@ -138,8 +138,11 @@ require __DIR__ . '/inc/header.php';
                 dieser Inhalte statt. Für die Kartendarstellung wird Kartenmaterial von OpenTopoMap
                 (basierend auf OpenStreetMap-Daten) direkt im Browser nachgeladen; dabei kann
                 technisch bedingt Ihre IP-Adresse an die Server von OpenTopoMap übermittelt werden.
-                Rechtsgrundlage ist unser berechtigtes Interesse an einer anschaulichen
-                Kartendarstellung (Art. 6 Abs. 1 lit. f DSGVO).
+                Zusätzlich wird auf jeder Seite dieser Website die für die Kartendarstellung
+                benötigte JavaScript-Bibliothek „Leaflet“ vom Content-Delivery-Network
+                unpkg.com nachgeladen; auch hierbei kann technisch bedingt Ihre IP-Adresse an
+                dessen Server übermittelt werden. Rechtsgrundlage ist unser berechtigtes
+                Interesse an einer anschaulichen Kartendarstellung (Art. 6 Abs. 1 lit. f DSGVO).
             </p>
 
             <p><strong>e) Meldung und Pflege von Standorten</strong></p>

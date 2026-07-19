@@ -51,6 +51,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'veroeffentlicht' => isset($_POST['veroeffentlicht']) ? 1 : 0,
         'breitengrad' => $_POST['breitengrad'] ?? '',
         'laengengrad' => $_POST['laengengrad'] ?? '',
+        'hoehe_meter' => $_POST['hoehe_meter'] ?? '',
+        'hoehe_vom_turm' => isset($_POST['hoehe_vom_turm']) ? 1 : 0,
         'zugaenglichkeit' => trim($_POST['zugaenglichkeit'] ?? ''),
         'parkplatz' => trim($_POST['parkplatz'] ?? ''),
         'andrang_erwartet' => trim($_POST['andrang_erwartet'] ?? ''),
@@ -76,7 +78,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     // Numerische Leerfelder als NULL statt leerem String behandeln
-    foreach (['entfernung_bad_homburg_km', 'fahrzeit_minuten', 'horizontbewertung', 'gesamtbewertung'] as $feld) {
+    foreach (['entfernung_bad_homburg_km', 'fahrzeit_minuten', 'hoehe_meter', 'horizontbewertung', 'gesamtbewertung'] as $feld) {
         if ($daten[$feld] === '') {
             $daten[$feld] = null;
         }
@@ -155,7 +157,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($id) {
             $sql = 'UPDATE standorte SET standortname=:standortname, kurzbeschreibung=:kurzbeschreibung,
                     status=:status, veroeffentlicht=:veroeffentlicht, breitengrad=:breitengrad,
-                    laengengrad=:laengengrad, zugaenglichkeit=:zugaenglichkeit, parkplatz=:parkplatz,
+                    laengengrad=:laengengrad, hoehe_meter=:hoehe_meter, hoehe_vom_turm=:hoehe_vom_turm,
+                    zugaenglichkeit=:zugaenglichkeit, parkplatz=:parkplatz,
                     andrang_erwartet=:andrang_erwartet, sicherheitsrisiken=:sicherheitsrisiken,
                     kartenlink=:kartenlink, region=:region,
                     entfernung_bad_homburg_km=:entfernung_bad_homburg_km, fahrzeit_minuten=:fahrzeit_minuten,
@@ -307,6 +310,11 @@ function feld(?array $daten, string $name, $fallback = ''): string {
 
         <label for="laengengrad">Längengrad *</label>
         <input type="text" id="laengengrad" name="laengengrad" required value="<?= feld($bestehend, 'laengengrad') ?>">
+
+        <label for="hoehe_meter">Höhe (m ü. NN)</label>
+        <input type="number" min="0" id="hoehe_meter" name="hoehe_meter" value="<?= feld($bestehend, 'hoehe_meter') ?>">
+
+        <label><input type="checkbox" name="hoehe_vom_turm" <?= !empty($bestehend['hoehe_vom_turm']) ? 'checked' : '' ?>> Höhe vom Turm (Aussichtsplattform, nicht Bodenniveau)</label>
 
         <label for="region">Region</label>
         <select id="region" name="region">

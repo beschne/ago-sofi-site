@@ -20,6 +20,8 @@ CREATE TABLE IF NOT EXISTS standorte (
     veroeffentlicht TINYINT(1) NOT NULL DEFAULT 0,
     breitengrad DECIMAL(9,6) NOT NULL,
     laengengrad DECIMAL(9,6) NOT NULL,
+    hoehe_meter SMALLINT UNSIGNED,
+    hoehe_vom_turm TINYINT(1) NOT NULL DEFAULT 0,
     zugaenglichkeit ENUM(
         'Jederzeit frei zugänglich',
         'Tagsüber frei zugänglich',

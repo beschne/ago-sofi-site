@@ -61,6 +61,7 @@ require __DIR__ . '/inc/header.php';
                         'Sicherheitsrisiken' => $s['sicherheitsrisiken'],
                         'Entfernung ab Bad Homburg' => $s['entfernung_bad_homburg_km'] !== null ? number_format((float) $s['entfernung_bad_homburg_km'], 1, ',', '.') . ' km' : null,
                         'Fahrzeit ab Bad Homburg' => $s['fahrzeit_minuten'] !== null ? $s['fahrzeit_minuten'] . ' min' : null,
+                        'Höhe' => $s['hoehe_meter'] !== null ? $s['hoehe_meter'] . ' m' . ($s['hoehe_vom_turm'] ? ' (vom Turm)' : '') : null,
                         'Horizontbewertung' => $s['horizontbewertung'] !== null ? bewertung_sonnen((int) $s['horizontbewertung']) : null,
                         'Gesamtbewertung' => $s['gesamtbewertung'] !== null ? bewertung_sonnen((int) $s['gesamtbewertung']) : null,
                     ];

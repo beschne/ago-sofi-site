@@ -1,3 +1,10 @@
+// Farben exakt wie die Status-Tags (siehe .badge-* in css/style.css).
+var STATUS_MARKER_FARBEN = {
+    "Geeignet": { rand: "#2c6b23", flaeche: "#dcf3d8" },
+    "Eingeschränkt geeignet": { rand: "#7a5d05", flaeche: "#fbf0c9" },
+    "Vor Ort geprüft": { rand: "#106354", flaeche: "#d3f0e8" }
+};
+
 // Initialisiert eine Leaflet-Karte mit OpenTopoMap-Kacheln und Standort-Markern.
 // filter: "geprueft" (nur veröffentlichte, geprüfte/empfohlene Standorte) oder
 // "alle" (alle gemeldeten Standorte, unabhängig vom Status).
@@ -49,9 +56,18 @@ function initStandorteKarte(elementId, filter) {
                 link.textContent = "Details";
                 popup.appendChild(link);
 
-                return L.marker([standort.lat, standort.lon])
-                    .bindPopup(popup)
-                    .addTo(karte);
+                var farben = filter === "geprueft" ? STATUS_MARKER_FARBEN[standort.status] : null;
+                var punkt = farben
+                    ? L.circleMarker([standort.lat, standort.lon], {
+                        radius: 9,
+                        weight: 3,
+                        color: farben.rand,
+                        fillColor: farben.flaeche,
+                        fillOpacity: 1
+                    })
+                    : L.marker([standort.lat, standort.lon]);
+
+                return punkt.bindPopup(popup).addTo(karte);
             });
 
             var gruppe = L.featureGroup(marker);

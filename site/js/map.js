@@ -5,7 +5,7 @@ function initStandorteKarte(elementId, filter) {
     fetch("api/standorte.php?filter=" + encodeURIComponent(filter))
         .then(function (response) { return response.json(); })
         .then(function (standorte) {
-            var karte = L.map(elementId);
+            var karte = L.map(elementId, { scrollWheelZoom: false });
             var kacheln = L.tileLayer("https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png", {
                 maxZoom: 17,
                 attribution: "Kartendaten: © OpenStreetMap-Mitwirkende, SRTM | Kartendarstellung: © OpenTopoMap (CC-BY-SA)"

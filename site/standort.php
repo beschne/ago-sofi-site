@@ -120,7 +120,7 @@ require __DIR__ . '/inc/header.php';
 <?php
 $extraFooter = '<script>
     (function () {
-        var karte = L.map("karte").setView([' . (float) $s['breitengrad'] . ', ' . (float) $s['laengengrad'] . '], 14);
+        var karte = L.map("karte", { scrollWheelZoom: false }).setView([' . (float) $s['breitengrad'] . ', ' . (float) $s['laengengrad'] . '], 14);
         L.tileLayer("https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png", {
             maxZoom: 17,
             attribution: "Kartendaten: © OpenStreetMap-Mitwirkende, SRTM | Kartendarstellung: © OpenTopoMap (CC-BY-SA)"

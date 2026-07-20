@@ -9,7 +9,7 @@ $pdo = ago_sofi_db();
 $stmt = $pdo->prepare(
     "SELECT * FROM standorte
      WHERE veroeffentlicht = 1 AND status IN ('Geeignet', 'Eingeschränkt geeignet', 'Vor Ort geprüft')
-     ORDER BY standortname"
+     ORDER BY " . STATUS_SORT_SQL . ", standortname"
 );
 $stmt->execute();
 $standorte = $stmt->fetchAll();

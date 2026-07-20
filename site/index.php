@@ -20,12 +20,14 @@ require __DIR__ . '/inc/header.php';
             <p>
                 Als Vorbereitung auf die partielle Sonnenfinsternis am 12. August 2026 sammelt und
                 prüft die AG Orion mögliche Beobachtungsstandorte. Hier findest du die bereits
-                geprüften und empfohlenen Standorte.
+                geprüften und empfohlenen Standorte. Alles Wissenswerte zur Finsternis selbst -
+                Kontaktzeiten, Sonnenstand und worauf es bei der Beobachtung ankommt - findest du auf
+                der Seite <a href="/sonnenfinsternis.php">Die Sonnenfinsternis</a>.
             </p>
             <p>
                 <strong>Tipp:</strong> Die Sonnenfinsternis am 12. August findet kurz vor
                 Sonnenuntergang statt. Besuche deinen gewählten Beobachtungsstandort daher am besten
-                schon einige Tage vorher – idealerweise am Vorabend – zur gleichen Uhrzeit und prüfe
+                schon einige Tage vorher - idealerweise am Vorabend - zur gleichen Uhrzeit und prüfe
                 dort den Sonnenuntergang: So siehst du direkt, ob die Sicht Richtung Horizont wirklich
                 frei ist.
             </p>

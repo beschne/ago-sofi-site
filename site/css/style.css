@@ -32,6 +32,11 @@ body {
     background: var(--color-page-bg);
 }
 
+strong {
+    font-weight: 700;
+    color: var(--color-heading);
+}
+
 #page {
     max-width: var(--max-width);
     margin: 2em auto;

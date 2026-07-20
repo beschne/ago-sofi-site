@@ -1,7 +1,7 @@
 <?php
 /**
  * Gemeinsamer Seitenkopf. Erwartet vor dem include gesetzt:
- * $title (string), $activeNav ("geprueft"|"alle"|"beobachten"), optional $extraHead (string, wird in <head> ausgegeben).
+ * $title (string), $activeNav ("geprueft"|"alle"|"sonnenfinsternis"|"beobachten"), optional $extraHead (string, wird in <head> ausgegeben).
  */
 function ago_sofi_nav_class(string $item, string $activeNav): string {
     return $item === $activeNav ? ' class="current" aria-current="page"' : '';
@@ -40,6 +40,7 @@ function ago_sofi_nav_class(string $item, string $activeNav): string {
                     <ul>
                         <li><a href="/"<?= ago_sofi_nav_class('geprueft', $activeNav) ?>>Empfohlene Standorte</a></li>
                         <li><a href="/alle-standorte.php"<?= ago_sofi_nav_class('alle', $activeNav) ?>>Alle Standorte</a></li>
+                        <li><a href="/sonnenfinsternis.php"<?= ago_sofi_nav_class('sonnenfinsternis', $activeNav) ?>>Die Sonnenfinsternis</a></li>
                         <li><a href="/beobachten.php"<?= ago_sofi_nav_class('beobachten', $activeNav) ?>>Sicher beobachten</a></li>
                     </ul>
                 </div>

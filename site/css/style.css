@@ -142,6 +142,12 @@ main h1 {
     margin: 1rem 0;
 }
 
+/* Eigene, nach Status eingefärbte Marker-Pins statt des Leaflet-Standardrahmens. */
+.standort-marker-icon {
+    background: none;
+    border: none;
+}
+
 .status-badge {
     display: inline-block;
     padding: 0.15em 0.7em;

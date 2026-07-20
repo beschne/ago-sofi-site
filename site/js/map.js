@@ -1,9 +1,36 @@
-// Farben exakt wie die Status-Tags (siehe .badge-* in css/style.css).
+// Randfarben exakt wie die Status-Tags (siehe .badge-* in css/style.css),
+// Füllfarben kräftiger/leuchtender als die blassen Tag-Hintergründe, damit
+// die Marker auf der Karte gut erkennbar sind (gleicher Farbton, mehr Sättigung).
 var STATUS_MARKER_FARBEN = {
-    "Geeignet": { rand: "#2c6b23", flaeche: "#dcf3d8" },
-    "Eingeschränkt geeignet": { rand: "#7a5d05", flaeche: "#fbf0c9" },
-    "Vor Ort geprüft": { rand: "#106354", flaeche: "#d3f0e8" }
+    "Vorschlag": { rand: "#0b6577", flaeche: "#3ddfff" },
+    "Zu prüfen": { rand: "#14527e", flaeche: "#3dafff" },
+    "Vor Ort geprüft": { rand: "#106354", flaeche: "#3dffdc" },
+    "Geeignet": { rand: "#2c6b23", flaeche: "#55ff3d" },
+    "Eingeschränkt geeignet": { rand: "#7a5d05", flaeche: "#ffcf3d" },
+    "Ungeeignet": { rand: "#8a3c11", flaeche: "#ff823d" },
+    "Nicht mehr verfügbar": { rand: "#7a1f1f", flaeche: "#ff3d3d" }
 };
+
+// Baut ein Marker-Icon in Pin-Form (wie das Standard-Leaflet-Icon), aber
+// eingefärbt in der Status-Farbe des Standorts.
+function standortIcon(status) {
+    var farben = STATUS_MARKER_FARBEN[status];
+    if (!farben) {
+        return new L.Icon.Default();
+    }
+    var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="26" height="38" viewBox="0 0 24 36">' +
+        '<path d="M12 0C5.4 0 0 5.4 0 12c0 8.4 12 24 12 24s12-15.6 12-24c0-6.6-5.4-12-12-12z" ' +
+        'fill="' + farben.flaeche + '" stroke="' + farben.rand + '" stroke-width="2"/>' +
+        '<circle cx="12" cy="12" r="5" fill="' + farben.rand + '"/>' +
+        '</svg>';
+    return L.divIcon({
+        html: svg,
+        className: "standort-marker-icon",
+        iconSize: [26, 38],
+        iconAnchor: [13, 37],
+        popupAnchor: [0, -34]
+    });
+}
 
 // Initialisiert eine Leaflet-Karte mit OpenTopoMap-Kacheln und Standort-Markern.
 // filter: "geprueft" (nur veröffentlichte, geprüfte/empfohlene Standorte) oder
@@ -56,18 +83,9 @@ function initStandorteKarte(elementId, filter) {
                 link.textContent = "Details";
                 popup.appendChild(link);
 
-                var farben = filter === "geprueft" ? STATUS_MARKER_FARBEN[standort.status] : null;
-                var punkt = farben
-                    ? L.circleMarker([standort.lat, standort.lon], {
-                        radius: 9,
-                        weight: 3,
-                        color: farben.rand,
-                        fillColor: farben.flaeche,
-                        fillOpacity: 1
-                    })
-                    : L.marker([standort.lat, standort.lon]);
-
-                return punkt.bindPopup(popup).addTo(karte);
+                return L.marker([standort.lat, standort.lon], { icon: standortIcon(standort.status) })
+                    .bindPopup(popup)
+                    .addTo(karte);
             });
 
             var gruppe = L.featureGroup(marker);

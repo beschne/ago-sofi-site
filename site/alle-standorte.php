@@ -6,7 +6,7 @@ $title = 'Alle Standorte – AG Orion Beobachtungsstandorte Sonnenfinsternis';
 $activeNav = 'alle';
 
 $pdo = ago_sofi_db();
-$stmt = $pdo->query("SELECT * FROM standorte ORDER BY standortname");
+$stmt = $pdo->query("SELECT * FROM standorte WHERE veroeffentlicht = 1 ORDER BY standortname");
 $standorte = $stmt->fetchAll();
 
 require __DIR__ . '/inc/header.php';

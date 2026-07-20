@@ -1,7 +1,7 @@
 <?php
 // Öffentliches JSON für die Leaflet-Karte (site/js/map.js).
 // ?filter=geprueft  -> nur veröffentlichte, geprüfte/empfohlene Standorte
-// ?filter=alle (oder ohne Parameter) -> alle Standorte, unabhängig vom Status
+// ?filter=alle (oder ohne Parameter) -> alle veröffentlichten Standorte, unabhängig vom Status
 
 require __DIR__ . '/../inc/db.php';
 
@@ -27,6 +27,7 @@ try {
         $stmt = $pdo->query(
             "SELECT slug, standortname, status, breitengrad, laengengrad
              FROM standorte
+             WHERE veroeffentlicht = 1
              ORDER BY standortname"
         );
     }

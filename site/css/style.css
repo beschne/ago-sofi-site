@@ -158,6 +158,7 @@ main h1 {
 .badge-eingeschraenkt { background: #fbf0c9; color: #7a5d05; }
 .badge-ungeeignet { background: #fbe0cf; color: #8a3c11; }
 .badge-nichtmehr { background: #f6d3d3; color: #7a1f1f; }
+.badge-unveroeffentlicht { background: #444; color: #fff; }
 
 /* Andrang-Tags: Skala von Blau (gering) über Gelb/Orange bis Rot (sehr hoch). */
 .andrang-sehr-gering { background: #d7e9fa; color: #14527e; }

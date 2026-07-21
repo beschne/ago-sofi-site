@@ -11,8 +11,9 @@ import matplotlib
 import numpy as np
 
 matplotlib.use("Agg")
+import matplotlib.patheffects as patheffects
 import matplotlib.pyplot as plt
-from matplotlib.patches import Circle, FancyBboxPatch
+from matplotlib.patches import Ellipse, FancyBboxPatch
 
 from sonnenstand import sun_altaz
 
@@ -25,7 +26,7 @@ GOLD = "#f4c430"
 MOON_NAVY = "#141a35"
 ORANGE_BANNER = "#b35927"
 CREAM_BOX = "#fdf8ec"
-MAROON = "#5c1a1a"
+MAROON = "#ffffff"
 
 
 def minute_seq(h0, m0, h1, m1):
@@ -57,6 +58,23 @@ def render(
     ax.imshow(np.array(crop), extent=[extent_left, extent_right, extent_bottom, extent_top], aspect="auto",
               zorder=0, interpolation="lanczos")
 
+    ax.set_xlim(az_range)
+    ax.set_ylim(alt_range)
+    ax.set_xticks(range(int(az_range[0]), int(az_range[1]) + 1, 5))
+    ax.set_yticks(range(int(alt_range[0]), int(alt_range[1]) + 1, 2))
+    ax.set_xlabel("Azimut (°)  –  Himmelsrichtung", fontsize=13, labelpad=28)
+    ax.set_ylabel("Höhe über Horizont (°)", fontsize=13)
+    ax.tick_params(labelsize=12)
+    ax.set_title(f"{name}  ({hoehe_m:.0f} m)   —   Tier {tier}", fontsize=19, fontweight="bold", pad=14)
+
+    compass = {225: "SW", 270: "W", 292.5: "WNW", 315: "NW", 337.5: "NNW"}
+    for az_c, label in compass.items():
+        if az_range[0] <= az_c <= az_range[1]:
+            ax.annotate(label, (az_c, alt_range[0]), xycoords="data", xytext=(0, -18),
+                        textcoords="offset points", ha="center", fontsize=11, color="#666666")
+
+    fig.tight_layout()
+
     full_range = minute_seq(17, 15, 18, 40)
     az_path, alt_path = [], []
     for h, m in full_range:
@@ -68,30 +86,48 @@ def render(
     ax.plot(az_path[mask], alt_path[mask], color=GOLD, linewidth=4, zorder=3, solid_capstyle="round", alpha=0.9,
             linestyle=(0, (1, 1.2)))
 
+    text_outline = [patheffects.withStroke(linewidth=3, foreground="#00000099")]
     for h, m, label in TIME_MARKS:
         alt, az, _ = sun_altaz(2026, 8, 12, h, m, 0, lat, lon)
         if az_range[0] <= az <= az_range[1]:
-            ax.plot(az, alt, "o", color=MAROON, markersize=8, zorder=4)
+            ax.plot(az, alt, "o", color=MAROON, markersize=8, zorder=4,
+                    markeredgecolor="#1a1a1a", markeredgewidth=1)
             ax.annotate(label, (az, alt), textcoords="offset points", xytext=(7, 8), color=MAROON,
-                        fontsize=12, fontweight="bold")
+                        fontsize=12, fontweight="bold", path_effects=text_outline)
 
     max_alt, max_az, _ = sun_altaz(2026, 8, 12, ECLIPSE_MAX_H, ECLIPSE_MAX_M, 0, lat, lon)
-    sun_r = (alt_range[1] - alt_range[0]) * 0.03
-    moon_dx = sun_r * 2 * (1 - ECLIPSE_MAGNITUDE_PCT / 100) * 1.35
-    ax.add_patch(Circle((max_az, max_alt), sun_r, color=GOLD, zorder=5))
-    ax.add_patch(Circle((max_az + moon_dx * 0.15, max_alt + moon_dx * 0.55), sun_r, color=MOON_NAVY, zorder=6))
 
-    box_x = max_az + 1.0
+    # Kreise sollen trotz ungleicher Achsenskalierung (Azimut- vs. Hoehengrad
+    # pro Pixel) tatsaechlich rund erscheinen -- dafuer per Ellipse mit dem
+    # aus der finalisierten Achsentransformation (nach tight_layout) ermittelten
+    # Pixel-Verhaeltnis.
+    fig.canvas.draw()
+    p0 = ax.transData.transform((0, 0))
+    px = ax.transData.transform((1, 0))
+    py = ax.transData.transform((0, 1))
+    px_per_az = abs(px[0] - p0[0])
+    px_per_alt = abs(py[1] - p0[1])
+
+    sun_r_az = (az_range[1] - az_range[0]) * 0.018
+    sun_r_alt = sun_r_az * (px_per_az / px_per_alt)
+    moon_dx_az = sun_r_az * 2 * (1 - ECLIPSE_MAGNITUDE_PCT / 100) * 1.35
+    moon_dx_alt = moon_dx_az * (px_per_az / px_per_alt)
+    ax.add_patch(Ellipse((max_az, max_alt), sun_r_az * 2, sun_r_alt * 2, color=GOLD, zorder=5))
+    ax.add_patch(Ellipse((max_az + moon_dx_az * 0.15, max_alt + moon_dx_alt * 0.55),
+                          sun_r_az * 2, sun_r_alt * 2, color=MOON_NAVY, zorder=6))
+
+    box_x = max_az + 3.5
     box_w = (az_range[1] - az_range[0]) * 0.19
     box_h = (alt_range[1] - alt_range[0]) * 0.15
     if box_x + box_w > az_range[1]:
-        box_x = max_az - 1.0 - box_w
-    ax.add_patch(FancyBboxPatch((box_x, max_alt - box_h / 2), box_w, box_h,
+        box_x = max_az - 3.5 - box_w
+    box_y_center = max_alt + (alt_range[1] - alt_range[0]) * 0.16
+    ax.add_patch(FancyBboxPatch((box_x, box_y_center - box_h / 2), box_w, box_h,
                                  boxstyle="round,pad=0.05,rounding_size=0.2", linewidth=1,
                                  edgecolor="#c9bfa0", facecolor=CREAM_BOX, zorder=6))
-    ax.text(box_x + box_w * 0.08, max_alt + box_h * 0.2, f"Maximum ~{ECLIPSE_MAX_LABEL}", fontsize=13,
+    ax.text(box_x + box_w * 0.08, box_y_center + box_h * 0.2, f"Maximum ~{ECLIPSE_MAX_LABEL}", fontsize=13,
             fontweight="bold", color="#1a1a1a", zorder=7, va="center")
-    ax.text(box_x + box_w * 0.08, max_alt - box_h * 0.2, f"{ECLIPSE_MAGNITUDE_PCT} % · {max_alt:.1f}°", fontsize=13,
+    ax.text(box_x + box_w * 0.08, box_y_center - box_h * 0.2, f"{ECLIPSE_MAGNITUDE_PCT} % · {max_alt:.1f}°", fontsize=13,
             fontweight="bold", color="#1a1a1a", zorder=7, va="center")
 
     banner_w = 0.85 * (az_range[1] - az_range[0])
@@ -106,25 +142,7 @@ def render(
 
     if horizon_hinweis:
         ax.text(az_range[0] + 0.3, alt_range[0] + 0.3, horizon_hinweis, fontsize=10, color="white",
-                fontweight="bold", zorder=7, va="bottom",
-                path_effects=[__import__("matplotlib.patheffects", fromlist=["withStroke"]).withStroke(linewidth=3, foreground="#00000099")])
+                fontweight="bold", zorder=7, va="bottom", path_effects=text_outline)
 
-    ax.set_xlim(az_range)
-    ax.set_ylim(alt_range)
-    ax.set_xticks(range(int(az_range[0]), int(az_range[1]) + 1, 5))
-    ax.set_yticks(range(int(alt_range[0]), int(alt_range[1]) + 1, 2))
-    ax.set_xlabel("Azimut (°)  –  Himmelsrichtung", fontsize=13)
-    ax.set_ylabel("Höhe über Horizont (°)", fontsize=13)
-    ax.tick_params(labelsize=12)
-
-    compass = {270: "W", 292.5: "WNW", 315: "NW"}
-    for az_c, label in compass.items():
-        if az_range[0] <= az_c <= az_range[1]:
-            ax.annotate(label, (az_c, alt_range[0]), xycoords="data", xytext=(0, -34),
-                        textcoords="offset points", ha="center", fontsize=11, color="#666666")
-
-    ax.set_title(f"{name}  ({hoehe_m:.0f} m)   —   Tier {tier}", fontsize=19, fontweight="bold", pad=14)
-
-    fig.tight_layout()
     fig.savefig(out_path, dpi=100)
     print(f"Geschrieben: {out_path}", file=sys.stderr)

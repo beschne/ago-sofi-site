@@ -3,6 +3,7 @@ require __DIR__ . '/../inc/db.php';
 require __DIR__ . '/../inc/helpers.php';
 require __DIR__ . '/../inc/csrf.php';
 require __DIR__ . '/../inc/upload.php';
+csrf_token(); // Session-Cookie muss gesetzt sein, bevor unten HTML-Ausgabe beginnt
 
 $pdo = ago_sofi_db();
 $alleStatus = ['Vorschlag', 'Zu prüfen', 'Vor Ort geprüft', 'Geeignet', 'Eingeschränkt geeignet', 'Ungeeignet', 'Nicht mehr verfügbar'];

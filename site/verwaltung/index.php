@@ -1,6 +1,7 @@
 <?php
 require __DIR__ . '/../inc/db.php';
 require __DIR__ . '/../inc/csrf.php';
+csrf_token(); // Session-Cookie muss gesetzt sein, bevor unten HTML-Ausgabe beginnt
 
 $statusFilter = $_GET['status'] ?? '';
 $veroeffentlichtFilter = $_GET['veroeffentlicht'] ?? '';

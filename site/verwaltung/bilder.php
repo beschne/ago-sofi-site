@@ -3,6 +3,7 @@ require __DIR__ . '/../inc/db.php';
 require __DIR__ . '/../inc/csrf.php';
 require __DIR__ . '/../inc/upload.php';
 require __DIR__ . '/../inc/helpers.php';
+csrf_token(); // Session-Cookie muss gesetzt sein, bevor unten HTML-Ausgabe beginnt
 
 $pdo = ago_sofi_db();
 $lizenzOptionen = [

@@ -199,8 +199,8 @@ $standorteFuerFilter = $pdo->query('SELECT id, standortname FROM standorte ORDER
                             <input type="number" step="0.000001" name="foto_meta[<?= (int) $foto['id'] ?>][gps_laengengrad]" value="<?= htmlspecialchars($foto['gps_laengengrad'] ?? '') ?>">
                         </label>
 
-                        <?php if ($osmLink = foto_osm_link($foto)): ?>
-                            <p class="hinweis"><a href="<?= htmlspecialchars($osmLink) ?>" target="_blank" rel="noopener">Aufnahmeort auf OpenStreetMap</a></p>
+                        <?php if ($luftbildLink = foto_luftbild_link($foto)): ?>
+                            <p class="hinweis"><a href="<?= htmlspecialchars($luftbildLink) ?>" target="_blank" rel="noopener">Aufnahmeort als Luftbild von Google Maps</a></p>
                         <?php endif; ?>
 
                         <label><input type="checkbox" name="foto_loeschen[]" value="<?= (int) $foto['id'] ?>"> löschen</label>

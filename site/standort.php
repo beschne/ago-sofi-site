@@ -67,8 +67,8 @@ require __DIR__ . '/inc/header.php';
                         'Entfernung ab Bad Homburg' => $s['entfernung_bad_homburg_km'] !== null ? number_format((float) $s['entfernung_bad_homburg_km'], 1, ',', '.') . ' km' : null,
                         'Fahrzeit ab Bad Homburg' => $s['fahrzeit_minuten'] !== null ? $s['fahrzeit_minuten'] . ' min' : null,
                         'Koordinaten' => implode(', ', array_filter([
-                            koordinate_grad((float) $s['laengengrad'], 'O', 'W'),
                             koordinate_grad((float) $s['breitengrad'], 'N', 'S'),
+                            koordinate_grad((float) $s['laengengrad'], 'O', 'W'),
                             $s['hoehe_meter'] !== null ? $s['hoehe_meter'] . ' m' . ($s['hoehe_vom_turm'] ? ' (vom Turm)' : '') : null,
                         ], fn($teil) => $teil !== null)),
                         'Zuletzt vor Ort geprüft' => $s['zuletzt_vor_ort_geprueft'] !== null ? date('d.m.Y', strtotime($s['zuletzt_vor_ort_geprueft'])) : null,

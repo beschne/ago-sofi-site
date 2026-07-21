@@ -124,22 +124,26 @@ $standorteFuerFilter = $pdo->query('SELECT id, standortname FROM standorte ORDER
         <p class="fehler"><?= htmlspecialchars($f) ?></p>
     <?php endforeach; ?>
 
-    <form method="get" style="margin-bottom: 1rem;">
-        <label for="standort_id">Nach Standort filtern:</label>
-        <select name="standort_id" id="standort_id" onchange="this.form.submit()">
-            <option value="">Alle Standorte</option>
-            <?php foreach ($standorteFuerFilter as $st): ?>
-                <option value="<?= (int) $st['id'] ?>" <?= $standortFilter === (int) $st['id'] ? 'selected' : '' ?>><?= htmlspecialchars($st['standortname']) ?></option>
-            <?php endforeach; ?>
-        </select>
+    <form method="get" class="bilder-filter">
+        <span class="filter-feld">
+            <label for="standort_id">Nach Standort filtern:</label>
+            <select name="standort_id" id="standort_id" onchange="this.form.submit()">
+                <option value="">Alle Standorte</option>
+                <?php foreach ($standorteFuerFilter as $st): ?>
+                    <option value="<?= (int) $st['id'] ?>" <?= $standortFilter === (int) $st['id'] ? 'selected' : '' ?>><?= htmlspecialchars($st['standortname']) ?></option>
+                <?php endforeach; ?>
+            </select>
+        </span>
 
-        <label for="kategorie">Nach Bildtyp filtern:</label>
-        <select name="kategorie" id="kategorie" onchange="this.form.submit()">
-            <option value="">Alle Bildtypen</option>
-            <?php foreach ($kategorieLabel as $wert => $label): ?>
-                <option value="<?= htmlspecialchars($wert) ?>" <?= $kategorieFilter === $wert ? 'selected' : '' ?>><?= htmlspecialchars($label) ?></option>
-            <?php endforeach; ?>
-        </select>
+        <span class="filter-feld">
+            <label for="kategorie">Nach Bildtyp filtern:</label>
+            <select name="kategorie" id="kategorie" onchange="this.form.submit()">
+                <option value="">Alle Bildtypen</option>
+                <?php foreach ($kategorieLabel as $wert => $label): ?>
+                    <option value="<?= htmlspecialchars($wert) ?>" <?= $kategorieFilter === $wert ? 'selected' : '' ?>><?= htmlspecialchars($label) ?></option>
+                <?php endforeach; ?>
+            </select>
+        </span>
     </form>
 
     <?php

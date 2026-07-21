@@ -59,6 +59,26 @@ table.admin-tabelle th {
     margin-top: 0.5rem;
 }
 
+.bilder-filter {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.bilder-filter .filter-feld {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.bilder-filter label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
 .admin-form label {
     display: block;
     margin: 0.9rem 0 0.25rem;

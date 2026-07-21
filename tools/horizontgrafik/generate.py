@@ -21,7 +21,7 @@ import numpy as np
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from matplotlib.colors import LinearSegmentedColormap
-from matplotlib.patches import Circle, FancyBboxPatch
+from matplotlib.patches import Ellipse, FancyBboxPatch
 
 from horizontprofil import fetch_elevations, horizon_profile
 from sonnenstand import sun_altaz
@@ -124,11 +124,6 @@ def render(lat, lon, name, hoehe_m, vom_turm, tier, out_path, az_range=(270, 300
                 fontweight="bold",
             )
 
-    sun_r = 0.42
-    moon_dx = sun_r * 2 * (1 - ECLIPSE_MAGNITUDE_PCT / 100) * 1.35
-    ax.add_patch(Circle((max_az, max_alt), sun_r, color=GOLD, zorder=5))
-    ax.add_patch(Circle((max_az + moon_dx * 0.15, max_alt + moon_dx * 0.55), sun_r, color=MOON_NAVY, zorder=6))
-
     box_x = max_az + 1.1
     ax.add_patch(
         FancyBboxPatch(
@@ -200,6 +195,31 @@ def render(lat, lon, name, hoehe_m, vom_turm, tier, out_path, az_range=(270, 300
     ax.set_title(f"{name}  ({height_part})   —   Tier {tier}", fontsize=19, fontweight="bold", pad=14)
 
     fig.tight_layout()
+
+    # Sonne/Mond erst jetzt zeichnen, nach dem endgueltigen Layout: die Achse hat
+    # ungleiche Grad-pro-Pixel-Skalierung in x (Azimut, meist 30-50 Grad Spannweite)
+    # und y (Hoehe, 0-14 Grad) -- ein Circle-Patch mit gleichem Radius in
+    # Datenkoordinaten erscheint deshalb als Ellipse. Stattdessen Radius/Versatz in
+    # Pixeln festlegen und erst dann achsenweise in Grad umrechnen, damit auf dem
+    # Bildschirm ein echter Kreis entsteht.
+    fig.canvas.draw()
+    p0 = ax.transData.transform((0, 0))
+    px = ax.transData.transform((1, 0))
+    py = ax.transData.transform((0, 1))
+    px_per_deg_x = abs(px[0] - p0[0])
+    px_per_deg_y = abs(py[1] - p0[1])
+
+    sun_r_px = 18
+    rx_deg = sun_r_px / px_per_deg_x
+    ry_deg = sun_r_px / px_per_deg_y
+    moon_dx_px = sun_r_px * 2 * (1 - ECLIPSE_MAGNITUDE_PCT / 100) * 1.35
+    moon_center = (
+        max_az + (moon_dx_px * 0.15) / px_per_deg_x,
+        max_alt + (moon_dx_px * 0.55) / px_per_deg_y,
+    )
+    ax.add_patch(Ellipse((max_az, max_alt), 2 * rx_deg, 2 * ry_deg, color=GOLD, zorder=5))
+    ax.add_patch(Ellipse(moon_center, 2 * rx_deg, 2 * ry_deg, color=MOON_NAVY, zorder=6))
+
     fig.savefig(out_path, dpi=100)
     print(f"Geschrieben: {out_path}", file=sys.stderr)
     if crossing is not None:

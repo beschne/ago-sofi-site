@@ -4,7 +4,8 @@ Mini-Website der AG Orion zur Vorbereitung auf die partielle Sonnenfinsternis
 am 12. August 2026: Sammeln und Prüfen möglicher Beobachtungsstandorte.
 Veröffentlicht unter https://sofi.agorion.de.
 
-![Karte der empfohlenen Beobachtungsstandorte mit nach Eignung eingefärbten Markern](SCREENSHOT.jpg)
+![Karte der empfohlenen Beobachtungsstandorte mit nach Eignung eingefärbten Markern](SCREENSHOT.jpg?v=f64c3b7e)
+<sub>Stand: 21.07.2026</sub>
 
 ## Tech-Stack
 

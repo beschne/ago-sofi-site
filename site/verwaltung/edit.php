@@ -200,6 +200,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (!empty($_POST['foto_meta']) && is_array($_POST['foto_meta'])) {
             foreach ($_POST['foto_meta'] as $fotoId => $meta) {
                 $fotoId = (int) $fotoId;
+                $beschreibung = trim($meta['beschreibung'] ?? '');
+                $beschreibung = $beschreibung !== '' ? $beschreibung : null;
                 $autor = trim($meta['autor_quelle'] ?? '');
                 $autor = $autor !== '' ? $autor : null;
                 $lizenzRoh = $meta['lizenz'] ?? '';
@@ -218,10 +220,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $lon = is_numeric($meta['gps_laengengrad'] ?? '') ? (float) $meta['gps_laengengrad'] : null;
 
                 $update = $pdo->prepare(
-                    'UPDATE standort_fotos SET autor_quelle=?, lizenz=?, aufnahme_zeitpunkt=?, gps_breitengrad=?, gps_laengengrad=?
+                    'UPDATE standort_fotos SET beschreibung=?, autor_quelle=?, lizenz=?, aufnahme_zeitpunkt=?, gps_breitengrad=?, gps_laengengrad=?
                      WHERE id=? AND standort_id=?'
                 );
-                $update->execute([$autor, $lizenz, $zeit, $lat, $lon, $fotoId, $id]);
+                $update->execute([$beschreibung, $autor, $lizenz, $zeit, $lat, $lon, $fotoId, $id]);
             }
         }
 
@@ -397,6 +399,10 @@ function feld(?array $daten, string $name, $fallback = ''): string {
                         <div class="bestehendes-foto">
                             <img src="/uploads/<?= htmlspecialchars($foto['dateiname']) ?>" alt="">
 
+                            <label>Beschreibung
+                                <input type="text" maxlength="255" name="foto_meta[<?= (int) $foto['id'] ?>][beschreibung]" value="<?= htmlspecialchars($foto['beschreibung'] ?? '') ?>">
+                            </label>
+
                             <label>Autor/Quelle
                                 <input type="text" name="foto_meta[<?= (int) $foto['id'] ?>][autor_quelle]" value="<?= htmlspecialchars($foto['autor_quelle'] ?? '') ?>">
                             </label>
@@ -422,6 +428,10 @@ function feld(?array $daten, string $name, $fallback = ''): string {
                             <label>GPS Längengrad
                                 <input type="number" step="0.000001" name="foto_meta[<?= (int) $foto['id'] ?>][gps_laengengrad]" value="<?= htmlspecialchars($foto['gps_laengengrad'] ?? '') ?>">
                             </label>
+
+                            <?php if ($osmLink = foto_osm_link($foto)): ?>
+                                <p class="hinweis"><a href="<?= htmlspecialchars($osmLink) ?>" target="_blank" rel="noopener">Aufnahmeort auf OpenStreetMap</a></p>
+                            <?php endif; ?>
 
                             <label><input type="checkbox" name="foto_loeschen[]" value="<?= (int) $foto['id'] ?>"> löschen</label>
                         </div>

@@ -105,6 +105,9 @@ require __DIR__ . '/inc/header.php';
                                     <a href="/uploads/<?= htmlspecialchars($foto['dateiname']) ?>" target="_blank" rel="noopener">
                                         <img src="/uploads/<?= htmlspecialchars($foto['dateiname']) ?>" loading="lazy" alt="<?= htmlspecialchars($kategorieLabel[$kategorie] ?? $kategorie) ?> – <?= htmlspecialchars($s['standortname']) ?>">
                                     </a>
+                                    <?php if (!empty($foto['beschreibung'])): ?>
+                                        <p class="foto-beschreibung"><?= htmlspecialchars($foto['beschreibung']) ?></p>
+                                    <?php endif; ?>
                                     <?php $credit = foto_credit($foto); ?>
                                     <?php if ($credit !== ''): ?>
                                         <figcaption><?= $credit ?></figcaption>

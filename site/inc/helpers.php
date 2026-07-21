@@ -98,7 +98,22 @@ function foto_credit(array $foto): string {
     if (!empty($foto['aufnahme_zeitpunkt'])) {
         $teile[] = date('d.m.Y', strtotime($foto['aufnahme_zeitpunkt']));
     }
+    if ($link = foto_osm_link($foto)) {
+        $teile[] = '<a href="' . htmlspecialchars($link) . '" target="_blank" rel="noopener">auf OpenStreetMap</a>';
+    }
     return implode(' &middot; ', $teile);
+}
+
+function foto_osm_link(array $foto): ?string {
+    if (!isset($foto['gps_breitengrad'], $foto['gps_laengengrad'])
+        || $foto['gps_breitengrad'] === null || $foto['gps_laengengrad'] === null
+        || $foto['gps_breitengrad'] === '' || $foto['gps_laengengrad'] === ''
+    ) {
+        return null;
+    }
+    $lat = (float) $foto['gps_breitengrad'];
+    $lon = (float) $foto['gps_laengengrad'];
+    return "https://www.openstreetmap.org/?mlat={$lat}&mlon={$lon}#map=17/{$lat}/{$lon}";
 }
 
 function slugify(string $text): string {

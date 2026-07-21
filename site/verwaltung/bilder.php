@@ -2,6 +2,7 @@
 require __DIR__ . '/../inc/db.php';
 require __DIR__ . '/../inc/csrf.php';
 require __DIR__ . '/../inc/upload.php';
+require __DIR__ . '/../inc/helpers.php';
 
 $pdo = ago_sofi_db();
 $lizenzOptionen = [
@@ -43,6 +44,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!empty($_POST['foto_meta']) && is_array($_POST['foto_meta'])) {
         foreach ($_POST['foto_meta'] as $fotoId => $meta) {
             $fotoId = (int) $fotoId;
+            $beschreibung = trim($meta['beschreibung'] ?? '');
+            $beschreibung = $beschreibung !== '' ? $beschreibung : null;
             $autor = trim($meta['autor_quelle'] ?? '');
             $autor = $autor !== '' ? $autor : null;
             $lizenzRoh = $meta['lizenz'] ?? '';
@@ -61,10 +64,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $lon = is_numeric($meta['gps_laengengrad'] ?? '') ? (float) $meta['gps_laengengrad'] : null;
 
             $update = $pdo->prepare(
-                'UPDATE standort_fotos SET autor_quelle=?, lizenz=?, aufnahme_zeitpunkt=?, gps_breitengrad=?, gps_laengengrad=?
+                'UPDATE standort_fotos SET beschreibung=?, autor_quelle=?, lizenz=?, aufnahme_zeitpunkt=?, gps_breitengrad=?, gps_laengengrad=?
                  WHERE id=?'
             );
-            $update->execute([$autor, $lizenz, $zeit, $lat, $lon, $fotoId]);
+            $update->execute([$beschreibung, $autor, $lizenz, $zeit, $lat, $lon, $fotoId]);
         }
     }
 
@@ -72,15 +75,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 $standortFilter = isset($_GET['standort_id']) ? (int) $_GET['standort_id'] : 0;
+$kategorieFilter = isset($_GET['kategorie']) && array_key_exists($_GET['kategorie'], $kategorieLabel) ? $_GET['kategorie'] : '';
+
+$bedingungen = [];
+$parameter = [];
+if ($standortFilter) {
+    $bedingungen[] = 'sf.standort_id = ?';
+    $parameter[] = $standortFilter;
+}
+if ($kategorieFilter) {
+    $bedingungen[] = 'sf.kategorie = ?';
+    $parameter[] = $kategorieFilter;
+}
 
 $sql = 'SELECT sf.*, s.standortname, s.slug
         FROM standort_fotos sf
         JOIN standorte s ON s.id = sf.standort_id';
-if ($standortFilter) {
-    $sql .= ' WHERE sf.standort_id = ' . (int) $standortFilter;
+if ($bedingungen) {
+    $sql .= ' WHERE ' . implode(' AND ', $bedingungen);
 }
 $sql .= ' ORDER BY s.standortname, sf.kategorie, sf.sortierung';
-$fotos = $pdo->query($sql)->fetchAll();
+$fotosStmt = $pdo->prepare($sql);
+$fotosStmt->execute($parameter);
+$fotos = $fotosStmt->fetchAll();
 
 $standorteFuerFilter = $pdo->query('SELECT id, standortname FROM standorte ORDER BY standortname')->fetchAll();
 ?>
@@ -115,12 +132,24 @@ $standorteFuerFilter = $pdo->query('SELECT id, standortname FROM standorte ORDER
                 <option value="<?= (int) $st['id'] ?>" <?= $standortFilter === (int) $st['id'] ? 'selected' : '' ?>><?= htmlspecialchars($st['standortname']) ?></option>
             <?php endforeach; ?>
         </select>
+
+        <label for="kategorie">Nach Bildtyp filtern:</label>
+        <select name="kategorie" id="kategorie" onchange="this.form.submit()">
+            <option value="">Alle Bildtypen</option>
+            <?php foreach ($kategorieLabel as $wert => $label): ?>
+                <option value="<?= htmlspecialchars($wert) ?>" <?= $kategorieFilter === $wert ? 'selected' : '' ?>><?= htmlspecialchars($label) ?></option>
+            <?php endforeach; ?>
+        </select>
     </form>
+
+    <?php
+    $filterQuery = array_filter(['standort_id' => $standortFilter ?: null, 'kategorie' => $kategorieFilter ?: null]);
+    ?>
 
     <?php if (empty($fotos)): ?>
         <p>Keine Bilder vorhanden.</p>
     <?php else: ?>
-        <form class="admin-form" method="post" action="bilder.php<?= $standortFilter ? '?standort_id=' . $standortFilter : '' ?>">
+        <form class="admin-form" method="post" action="bilder.php<?= $filterQuery ? '?' . http_build_query($filterQuery) : '' ?>">
             <?= csrf_field() ?>
             <div class="bestehende-fotos">
                 <?php foreach ($fotos as $foto): ?>
@@ -134,6 +163,10 @@ $standorteFuerFilter = $pdo->query('SELECT id, standortname FROM standorte ORDER
                         </p>
 
                         <img src="/uploads/<?= htmlspecialchars($foto['dateiname']) ?>" alt="">
+
+                        <label>Beschreibung
+                            <input type="text" maxlength="255" name="foto_meta[<?= (int) $foto['id'] ?>][beschreibung]" value="<?= htmlspecialchars($foto['beschreibung'] ?? '') ?>">
+                        </label>
 
                         <label>Autor/Quelle
                             <input type="text" name="foto_meta[<?= (int) $foto['id'] ?>][autor_quelle]" value="<?= htmlspecialchars($foto['autor_quelle'] ?? '') ?>">
@@ -160,6 +193,10 @@ $standorteFuerFilter = $pdo->query('SELECT id, standortname FROM standorte ORDER
                         <label>GPS Längengrad
                             <input type="number" step="0.000001" name="foto_meta[<?= (int) $foto['id'] ?>][gps_laengengrad]" value="<?= htmlspecialchars($foto['gps_laengengrad'] ?? '') ?>">
                         </label>
+
+                        <?php if ($osmLink = foto_osm_link($foto)): ?>
+                            <p class="hinweis"><a href="<?= htmlspecialchars($osmLink) ?>" target="_blank" rel="noopener">Aufnahmeort auf OpenStreetMap</a></p>
+                        <?php endif; ?>
 
                         <label><input type="checkbox" name="foto_loeschen[]" value="<?= (int) $foto['id'] ?>"> löschen</label>
                     </div>

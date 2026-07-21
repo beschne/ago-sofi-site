@@ -83,6 +83,7 @@ CREATE TABLE IF NOT EXISTS standort_fotos (
     kategorie ENUM('horizontfoto', 'panorama', 'horizontgrafik', 'weiteres') NOT NULL,
     dateiname VARCHAR(255) NOT NULL,
     sortierung SMALLINT UNSIGNED NOT NULL DEFAULT 0,
+    beschreibung VARCHAR(255),
     autor_quelle VARCHAR(255),
     lizenz ENUM(
         'Eigenes Werk (AGO)',

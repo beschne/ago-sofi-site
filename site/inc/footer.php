@@ -1,7 +1,7 @@
         </main>
 
         <footer>
-            &copy; 2026 AG Orion &middot; <a href="/impressum-datenschutz.php">Impressum / Datenschutz</a>
+            &copy; 2026 AG Orion &middot; <a href="/impressum-datenschutz">Impressum / Datenschutz</a>
         </footer>
     </div>
 

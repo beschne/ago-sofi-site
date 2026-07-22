@@ -22,7 +22,7 @@ require __DIR__ . '/inc/header.php';
                 prüft die AG Orion mögliche Beobachtungsstandorte. Hier findest du die bereits
                 geprüften und empfohlenen Standorte. Alles Wissenswerte zur Finsternis selbst -
                 Kontaktzeiten, Sonnenstand und worauf es bei der Beobachtung ankommt - findest du auf
-                der Seite <a href="/sonnenfinsternis.php">Die Sonnenfinsternis</a>.
+                der Seite <a href="/sonnenfinsternis">Die Sonnenfinsternis</a>.
             </p>
             <p>
                 <strong>Tipp:</strong> Die Sonnenfinsternis am 12. August findet kurz vor
@@ -55,7 +55,7 @@ require __DIR__ . '/inc/header.php';
                 Du kennst einen weiteren guten Beobachtungsstandort? Bitte melde ihn dem Vorstand,
                 damit er geprüft und gegebenenfalls hier aufgenommen werden kann. Eine Übersicht
                 aller gemeldeten Standorte inkl. Prüfstatus findest du unter
-                <a href="/alle-standorte.php">Alle Standorte</a>.
+                <a href="/alle-standorte">Alle Standorte</a>.
             </p>
 <?php
 $extraFooter = '<script>initStandorteKarte("karte", "geprueft");</script>';

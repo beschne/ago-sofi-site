@@ -50,9 +50,9 @@ function ago_sofi_nav_class(string $item, string $activeNav): string {
                 <div>
                     <ul>
                         <li><a href="/"<?= ago_sofi_nav_class('geprueft', $activeNav) ?>>Empfohlene Standorte</a></li>
-                        <li><a href="/alle-standorte.php"<?= ago_sofi_nav_class('alle', $activeNav) ?>>Alle Standorte</a></li>
-                        <li><a href="/sonnenfinsternis.php"<?= ago_sofi_nav_class('sonnenfinsternis', $activeNav) ?>>Die Sonnenfinsternis</a></li>
-                        <li><a href="/beobachten.php"<?= ago_sofi_nav_class('beobachten', $activeNav) ?>>Sicher beobachten</a></li>
+                        <li><a href="/alle-standorte"<?= ago_sofi_nav_class('alle', $activeNav) ?>>Alle Standorte</a></li>
+                        <li><a href="/sonnenfinsternis"<?= ago_sofi_nav_class('sonnenfinsternis', $activeNav) ?>>Die Sonnenfinsternis</a></li>
+                        <li><a href="/beobachten"<?= ago_sofi_nav_class('beobachten', $activeNav) ?>>Sicher beobachten</a></li>
                     </ul>
                 </div>
             </nav>

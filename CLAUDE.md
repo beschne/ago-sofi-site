@@ -83,6 +83,12 @@ Mac aus nicht überschrieben/gelöscht werden.
 * **impressum-datenschutz.php** — Impressum und Datenschutzerklärung (im Footer aller Seiten
   verlinkt). Datenschutztext beschreibt den aktuellen Stand (eigene DB, OpenTopoMap-Kacheln,
   keine Airtable-Einbindung mehr).
+* **sitemap.php** (ausgeliefert unter `/sitemap.xml`, siehe nginx-Rewrite) — erzeugt die
+  Sitemap live aus der DB (alle Standorte mit `veroeffentlicht=1`, unabhängig vom Status) plus
+  den statischen Seiten. Die Liste der statischen Seiten in der Datei ist von Hand gepflegt —
+  eine neue statische Seite muss dort ergänzt werden, sonst fehlt sie in der Sitemap.
+  `robots.txt` sperrt `/verwaltung/` für Crawler (zusätzlich zur echten Absicherung per
+  Basic-Auth) und verweist auf die Sitemap.
 
 ## Datenbank
 

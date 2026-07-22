@@ -149,7 +149,7 @@ require __DIR__ . '/inc/header.php';
      weniger grell wirkt als sonst. Eine zertifizierte <strong>SoFi-Brille</strong> für den
      freien Blick und ein passender <strong>Objektivfilter</strong> für Fernglas oder Teleskop
      gehören deshalb durchgehend zur Grundausstattung - improvisierte Lösungen bitte nicht.
-     Mehr dazu auf unserer Seite <a href="/beobachten.php">Sicher beobachten</a>.</p>
+     Mehr dazu auf unserer Seite <a href="/beobachten">Sicher beobachten</a>.</p>
 
   <p>Kurz zu den Zahlen: Alle Uhrzeiten sind in <strong>MESZ</strong> (UTC+2), die
      Höhenangaben refraktionskorrigiert (15 °C, 990 hPa) - gerade knapp über dem Horizont

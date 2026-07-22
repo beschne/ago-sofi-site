@@ -119,7 +119,7 @@ require __DIR__ . '/inc/header.php';
                 </section>
             <?php endif; ?>
 
-            <p><a href="/alle-standorte.php">&larr; Zurück zur Übersicht aller Standorte</a></p>
+            <p><a href="/alle-standorte">&larr; Zurück zur Übersicht aller Standorte</a></p>
 <?php
 $extraFooter = '<script>
     (function () {

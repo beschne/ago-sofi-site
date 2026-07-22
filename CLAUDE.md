@@ -42,7 +42,9 @@ eigenes PHP/MySQL-Backend umgestellt. Airtable wird nicht mehr verwendet.
     ├── verwaltung/                  (Basic-Auth-geschützte Datenpflege)
     │   ├── index.php
     │   ├── edit.php
-    │   └── delete.php
+    │   ├── delete.php
+    │   ├── bilder.php               (Fotoverwaltung über alle Standorte hinweg)
+    │   └── datenqualitaet.php       (Datenqualitäts-Check, siehe unten)
     ├── api/
     │   └── standorte.php       (öffentliches JSON für die Karte)
     ├── inc/
@@ -98,6 +100,20 @@ Tabellen `standorte` und `standort_fotos` in der Datenbank `ago_sofi`, Schema in
 * **Verwaltungsoberfläche** (`site/verwaltung/`) für Anlegen/Bearbeiten/Löschen inkl. Foto-Upload,
   geschützt durch nginx `auth_basic` (siehe DEPLOYMENT.md für Zugangsdaten-Verwaltung) plus
   CSRF-Token (`inc/csrf.php`) auf allen Formularen.
+* **Datenqualität** (`site/verwaltung/datenqualitaet.php`): rein lesende Übersichtsseite, prüft
+  jeden Standort gegen sechs Kriterien und verlinkt Treffer direkt zu `edit.php?id=…` — kein
+  Automatismus, der Inhalte ändert. Kriterien: (1) Horizontgrafik vorhanden, (2) Datum
+  `zuletzt_vor_ort_geprueft` gesetzt (hartes Kriterium nur bei Status "Geeignet", bei
+  "Eingeschränkt geeignet" nur eine Info, kein Fehler — siehe (2w)), (2b) veröffentlichte
+  Standorte mit Status Geeignet/Eingeschränkt geeignet müssen sonst vollständig ausgefüllt
+  sein, (3) `kartenlink` vorhanden und konsistent zu `breitengrad`/`laengengrad` (fängt
+  Kartenlinks ab, die nach einer nachträglichen Koordinatenkorrektur nicht mitgezogen wurden),
+  (4) Entfernung/Fahrzeit ab Bad Homburg gesetzt (nur Vorhandensein, keine Plausibilität), (5)
+  Koordinaten im Suchgebiet (Breite 49–51°/Länge 7,5–9,5°, fängt grobe Tippfehler ab), (6)
+  mögliche Duplikate über Koordinaten-Nähe (< 200 m). **Kein Kriterium:**
+  `veroeffentlicht=1` bei nicht-"geprüftem" Status ist bewusst so vorgesehen (Mitglieder sollen
+  auch unfertige/ungeeignete Standorte auf "Alle Standorte" sehen und dazu Stellung beziehen
+  können) und wird deshalb nicht geprüft.
 
 ## Kartendaten
 

@@ -42,6 +42,7 @@ $alleStatus = ['Vorschlag', 'Zu prüfen', 'Vor Ort geprüft', 'Geeignet', 'Einge
         <h1>Standorte verwalten</h1>
         <div class="admin-header-aktionen">
             <a href="bilder.php">Bilder verwalten</a>
+            <a href="datenqualitaet.php">Datenqualität</a>
             <a href="edit.php" class="btn">+ Neuer Standort</a>
         </div>
     </div>

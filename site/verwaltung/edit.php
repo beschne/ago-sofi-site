@@ -59,6 +59,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'andrang_erwartet' => trim($_POST['andrang_erwartet'] ?? ''),
         'sicherheitsrisiken' => trim($_POST['sicherheitsrisiken'] ?? ''),
         'kartenlink' => trim($_POST['kartenlink'] ?? ''),
+        'webseite' => trim($_POST['webseite'] ?? ''),
         'region' => trim($_POST['region'] ?? ''),
         'entfernung_bad_homburg_km' => $_POST['entfernung_bad_homburg_km'] ?? '',
         'fahrzeit_minuten' => $_POST['fahrzeit_minuten'] ?? '',
@@ -85,7 +86,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $daten[$feld] = null;
         }
     }
-    foreach (['zugaenglichkeit', 'parkplatz', 'andrang_erwartet', 'sicherheitsrisiken', 'kartenlink', 'region', 'kurzbeschreibung', 'kurze_bewertung', 'interne_notiz', 'zuletzt_vor_ort_geprueft'] as $feld) {
+    foreach (['zugaenglichkeit', 'parkplatz', 'andrang_erwartet', 'sicherheitsrisiken', 'kartenlink', 'webseite', 'region', 'kurzbeschreibung', 'kurze_bewertung', 'interne_notiz', 'zuletzt_vor_ort_geprueft'] as $feld) {
         if ($daten[$feld] === '') {
             $daten[$feld] = null;
         }
@@ -108,6 +109,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     if ($daten['kartenlink'] !== null && !preg_match('#^https?://#i', $daten['kartenlink'])) {
         $fehler[] = 'Kartenlink muss mit http:// oder https:// beginnen.';
+    }
+    if ($daten['webseite'] !== null && !preg_match('#^https?://#i', $daten['webseite'])) {
+        $fehler[] = 'Webseite muss mit http:// oder https:// beginnen.';
     }
 
     // Foto-Uploads verarbeiten (auch bei Validierungsfehlern schon prüfen, um früh Fehler zu zeigen)
@@ -162,7 +166,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     laengengrad=:laengengrad, hoehe_meter=:hoehe_meter, hoehe_vom_turm=:hoehe_vom_turm,
                     zugaenglichkeit=:zugaenglichkeit, parkplatz=:parkplatz,
                     andrang_erwartet=:andrang_erwartet, sicherheitsrisiken=:sicherheitsrisiken,
-                    kartenlink=:kartenlink, region=:region,
+                    kartenlink=:kartenlink, webseite=:webseite, region=:region,
                     entfernung_bad_homburg_km=:entfernung_bad_homburg_km, fahrzeit_minuten=:fahrzeit_minuten,
                     zuletzt_vor_ort_geprueft=:zuletzt_vor_ort_geprueft,
                     horizontbewertung=:horizontbewertung, gesamtbewertung=:gesamtbewertung,
@@ -363,6 +367,9 @@ function feld(?array $daten, string $name, $fallback = ''): string {
 
         <label for="kartenlink">Kartenlink (URL)</label>
         <input type="url" id="kartenlink" name="kartenlink" value="<?= feld($bestehend, 'kartenlink') ?>">
+
+        <label for="webseite">Webseite (URL, optional)</label>
+        <input type="url" id="webseite" name="webseite" value="<?= feld($bestehend, 'webseite') ?>">
 
         <label for="entfernung_bad_homburg_km">Entfernung ab Bad Homburg (km)</label>
         <input type="number" step="0.1" id="entfernung_bad_homburg_km" name="entfernung_bad_homburg_km" value="<?= feld($bestehend, 'entfernung_bad_homburg_km') ?>">

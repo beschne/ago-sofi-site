@@ -55,6 +55,7 @@ CREATE TABLE IF NOT EXISTS standorte (
         'Nicht bewertet'
     ),
     kartenlink VARCHAR(500),
+    webseite VARCHAR(500),
     region ENUM(
         'Vordertaunus',
         'Hintertaunus',

@@ -92,6 +92,10 @@ require __DIR__ . '/inc/header.php';
                 <?php if ($s['kartenlink']): ?>
                     <p><a href="<?= htmlspecialchars($s['kartenlink']) ?>" target="_blank" rel="noopener">Standort auf OpenStreetMap öffnen</a></p>
                 <?php endif; ?>
+
+                <?php if ($s['webseite']): ?>
+                    <p><a href="<?= htmlspecialchars($s['webseite']) ?>" target="_blank" rel="noopener">Webseite öffnen</a></p>
+                <?php endif; ?>
             </section>
 
             <?php if (!empty($fotosNachKategorie)): ?>

@@ -1,6 +1,7 @@
 <?php
 require __DIR__ . '/../inc/db.php';
 require __DIR__ . '/../inc/csrf.php';
+require __DIR__ . '/../inc/upload.php';
 csrf_token(); // Session-Cookie muss gesetzt sein, bevor unten HTML-Ausgabe beginnt
 
 $pdo = ago_sofi_db();
@@ -91,6 +92,45 @@ for ($i = 0; $i < $anzahl; $i++) {
     }
 }
 
+// 7. Fotos ohne Autor/Quelle oder ohne Lizenz
+$fotosUnvollstaendig = $pdo->query(
+    "SELECT standort_id, dateiname, autor_quelle, lizenz FROM standort_fotos
+     WHERE autor_quelle IS NULL OR autor_quelle = '' OR lizenz IS NULL"
+)->fetchAll();
+$kriterium7 = [];
+foreach ($fotosUnvollstaendig as $foto) {
+    $standort = null;
+    foreach ($standorte as $s) {
+        if ((int) $s['id'] === (int) $foto['standort_id']) {
+            $standort = $s;
+            break;
+        }
+    }
+    if ($standort === null) {
+        continue;
+    }
+    $fehlend = [];
+    if ($foto['autor_quelle'] === null || $foto['autor_quelle'] === '') {
+        $fehlend[] = 'Autor/Quelle';
+    }
+    if ($foto['lizenz'] === null) {
+        $fehlend[] = 'Lizenz';
+    }
+    $kriterium7[] = ['standort' => $standort, 'dateiname' => $foto['dateiname'], 'fehlend' => $fehlend];
+}
+
+// 8. Datei-Leichen: Dateien in uploads/, die in keiner standort_fotos-Zeile referenziert werden
+$referenzierteDateien = array_flip($pdo->query('SELECT dateiname FROM standort_fotos')->fetchAll(PDO::FETCH_COLUMN));
+$kriterium8 = [];
+foreach (scandir(ago_sofi_uploads_dir()) ?: [] as $datei) {
+    if ($datei === '.' || $datei === '..' || !is_file(ago_sofi_uploads_dir() . '/' . $datei)) {
+        continue;
+    }
+    if (!isset($referenzierteDateien[$datei])) {
+        $kriterium8[] = $datei;
+    }
+}
+
 function dq_zeile(array $s, ?string $zusatz = null): string {
     $html = '<tr><td>' . htmlspecialchars($s['standortname']) . '</td>';
     $html .= '<td>' . htmlspecialchars($s['status']) . '</td>';
@@ -169,6 +209,23 @@ function dq_tabelle(array $zeilenHtml): string {
                         <a href="edit.php?id=<?= (int) $paar['b']['id'] ?>">B bearbeiten</a>
                     </td>
                 </tr>
+            <?php endforeach; ?>
+            </tbody>
+        </table>
+    <?php endif; ?>
+
+    <h2>7. Fotos ohne Autor/Quelle oder Lizenz</h2>
+    <?= dq_tabelle(array_map(fn($e) => dq_zeile($e['standort'], $e['dateiname'] . ': ' . implode(', ', $e['fehlend'])), $kriterium7)) ?>
+
+    <h2 title="Dateien in site/uploads/, auf die keine Zeile in standort_fotos mehr verweist. Können manuell im Dateisystem gelöscht werden.">8. Datei-Leichen in uploads/ (keine DB-Referenz mehr)</h2>
+    <?php if (!$kriterium8): ?>
+        <p class="erfolg">Keine Treffer.</p>
+    <?php else: ?>
+        <table class="admin-tabelle">
+            <thead><tr><th>Dateiname</th></tr></thead>
+            <tbody>
+            <?php foreach ($kriterium8 as $datei): ?>
+                <tr><td><?= htmlspecialchars($datei) ?></td></tr>
             <?php endforeach; ?>
             </tbody>
         </table>

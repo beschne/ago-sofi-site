@@ -82,9 +82,11 @@ def find_horizon_crossing(az_path, alt_path, az_hz, hz):
     return None
 
 
-def render(lat, lon, name, hoehe_m, vom_turm, tier, out_path, az_range=(270, 300)):
+def render(lat, lon, name, hoehe_m, vom_turm, tier, out_path, eye_height_m=1.6, az_range=(270, 300)):
     print("Berechne Horizontprofil ...", file=sys.stderr)
-    az_hz, hz = horizon_profile(lat, lon, az_start=az_range[0] - 5, az_end=az_range[1] + 5, az_step=0.5)
+    az_hz, hz = horizon_profile(
+        lat, lon, eye_height_m=eye_height_m, az_start=az_range[0] - 5, az_end=az_range[1] + 5, az_step=0.5
+    )
 
     full_range = minute_seq(17, 15, 18, 40)
     az_path, alt_path = sun_path(lat, lon, full_range)
@@ -237,13 +239,18 @@ def main():
     p.add_argument("--vom-turm", action="store_true")
     p.add_argument("--tier", type=int, required=True)
     p.add_argument("--out", required=True)
+    p.add_argument(
+        "--eye-height", type=float, default=1.6,
+        help="Augenhoehe des Beobachters ueber dem SRTM-Bodenniveau in Metern "
+        "(Default 1.6 m Person; bei Aussichtstuermen/-plattformen die Hoehe der Plattform ueber Grund)",
+    )
     args = p.parse_args()
 
     hoehe = args.hoehe
     if hoehe is None:
         hoehe = fetch_elevations([(args.lat, args.lon)])[0]
 
-    render(args.lat, args.lon, args.name, hoehe, args.vom_turm, args.tier, args.out)
+    render(args.lat, args.lon, args.name, hoehe, args.vom_turm, args.tier, args.out, eye_height_m=args.eye_height)
 
 
 if __name__ == "__main__":

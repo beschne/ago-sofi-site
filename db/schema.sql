@@ -63,7 +63,8 @@ CREATE TABLE IF NOT EXISTS standorte (
         'Wetterau',
         'Vogelsberg',
         'Rhön',
-        'Lahn-Dill-Bergland'
+        'Lahn-Dill-Bergland',
+        'Frankfurt'
     ),
     entfernung_bad_homburg_km DECIMAL(5,1),
     fahrzeit_minuten SMALLINT UNSIGNED,

@@ -30,10 +30,11 @@ function ago_sofi_nav_class(string $item, string $activeNav): string {
             <a href="/" class="branding-image">
                 <!-- Test: SoFi-Banner statt Original-Logo (agorion.de). Original liegt
                      unverändert unter /img/banner-original-{300,768,940}.jpg, siehe unten. -->
-                <img src="/img/banner-940.jpg"
-                     srcset="/img/banner-300.jpg 300w,
-                             /img/banner-768.jpg 768w,
-                             /img/banner-940.jpg 940w"
+                <?php $bannerV = @filemtime(__DIR__ . '/../img/banner-940.jpg') ?: '1'; ?>
+                <img src="/img/banner-940.jpg?v=<?= $bannerV ?>"
+                     srcset="/img/banner-300.jpg?v=<?= $bannerV ?> 300w,
+                             /img/banner-768.jpg?v=<?= $bannerV ?> 768w,
+                             /img/banner-940.jpg?v=<?= $bannerV ?> 940w"
                      sizes="(max-width: 940px) 100vw, 940px"
                      width="940" height="198" alt="Astronomische Gesellschaft Orion" loading="lazy">
                 <!--

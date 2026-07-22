@@ -64,7 +64,8 @@ CREATE TABLE IF NOT EXISTS standorte (
         'Vogelsberg',
         'Rhön',
         'Lahn-Dill-Bergland',
-        'Frankfurt'
+        'Frankfurt',
+        'Rhein-Main-Süden'
     ),
     entfernung_bad_homburg_km DECIMAL(5,1),
     fahrzeit_minuten SMALLINT UNSIGNED,

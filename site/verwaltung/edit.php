@@ -21,7 +21,7 @@ $lizenzOptionen = [
     'Freigabe durch Urheber',
     'Sonstige',
 ];
-$regionOptionen = ['Vordertaunus', 'Hintertaunus', 'Wetterau-Rand', 'Odenwald/Bergstraße', 'Wetterau', 'Vogelsberg', 'Rhön', 'Lahn-Dill-Bergland', 'Frankfurt'];
+$regionOptionen = ['Frankfurt', 'Hintertaunus', 'Lahn-Dill-Bergland', 'Odenwald/Bergstraße', 'Rhein-Main-Süden', 'Rhön', 'Vogelsberg', 'Vordertaunus', 'Wetterau', 'Wetterau-Rand'];
 $zugaenglichkeitOptionen = ['Jederzeit frei zugänglich', 'Tagsüber frei zugänglich', 'Nur zu Fuß erreichbar', 'Genehmigung erforderlich', 'Privatgelände', 'Gesperrt', 'Unbekannt'];
 $parkplatzOptionen = ['Direkt am Standort', '< 100 m', '100 - 500m', '> 500m', 'Kein Parkplatz', 'Unbekannt'];
 $andrangOptionen = ['Sehr gering', 'Gering', 'Mittel', 'Hoch', 'Sehr hoch', 'Unbekannt'];

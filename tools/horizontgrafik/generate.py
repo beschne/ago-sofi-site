@@ -8,7 +8,7 @@ berechneten Gelaendehorizont.
 
 Nutzung:
     python3 generate.py --lat 50.31313 --lon 8.578405 --name "Parkplatz Am Schlick, Wehrheim" \
-        --hoehe 360 --tier 2 --out wehrheim.png
+        --hoehe 360 --out wehrheim.png
 
 Ohne --hoehe wird die SRTM-Hoehe am Standort selbst verwendet.
 """
@@ -82,7 +82,7 @@ def find_horizon_crossing(az_path, alt_path, az_hz, hz):
     return None
 
 
-def render(lat, lon, name, hoehe_m, vom_turm, tier, out_path, eye_height_m=1.6, az_range=(270, 300)):
+def render(lat, lon, name, hoehe_m, vom_turm, out_path, eye_height_m=1.6, az_range=(270, 300)):
     print("Berechne Horizontprofil ...", file=sys.stderr)
     az_hz, hz = horizon_profile(
         lat, lon, eye_height_m=eye_height_m, az_start=az_range[0] - 5, az_end=az_range[1] + 5, az_step=0.5
@@ -194,7 +194,7 @@ def render(lat, lon, name, hoehe_m, vom_turm, tier, out_path, eye_height_m=1.6, 
     height_part = f"{hoehe_m:.0f} m" if hoehe_m is not None else "Höhe unbekannt"
     if vom_turm:
         height_part += " · vom Turm"
-    ax.set_title(f"{name}  ({height_part})   —   Tier {tier}", fontsize=19, fontweight="bold", pad=14)
+    ax.set_title(f"{name}  ({height_part})", fontsize=19, fontweight="bold", pad=14)
 
     fig.tight_layout()
 
@@ -237,7 +237,6 @@ def main():
     p.add_argument("--name", required=True)
     p.add_argument("--hoehe", type=float, default=None, help="Hoehe in m, falls bekannt (sonst SRTM)")
     p.add_argument("--vom-turm", action="store_true")
-    p.add_argument("--tier", type=int, required=True)
     p.add_argument("--out", required=True)
     p.add_argument(
         "--eye-height", type=float, default=1.6,
@@ -250,7 +249,7 @@ def main():
     if hoehe is None:
         hoehe = fetch_elevations([(args.lat, args.lon)])[0]
 
-    render(args.lat, args.lon, args.name, hoehe, args.vom_turm, args.tier, args.out, eye_height_m=args.eye_height)
+    render(args.lat, args.lon, args.name, hoehe, args.vom_turm, args.out, eye_height_m=args.eye_height)
 
 
 if __name__ == "__main__":

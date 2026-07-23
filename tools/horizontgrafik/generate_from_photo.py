@@ -35,7 +35,7 @@ def minute_seq(h0, m0, h1, m1):
 
 
 def render(
-    lat, lon, name, hoehe_m, tier, photo_path, az_to_col, row_to_alt, crop_box,
+    lat, lon, name, hoehe_m, photo_path, az_to_col, row_to_alt, crop_box,
     az_range, alt_range, banner_text, horizon_hinweis, out_path,
 ):
     """az_to_col: (slope, intercept) fuer col = slope*az+intercept.
@@ -65,7 +65,7 @@ def render(
     ax.set_xlabel("Azimut (°)  –  Himmelsrichtung", fontsize=13, labelpad=28)
     ax.set_ylabel("Höhe über Horizont (°)", fontsize=13)
     ax.tick_params(labelsize=12)
-    ax.set_title(f"{name}  ({hoehe_m:.0f} m)   —   Tier {tier}", fontsize=19, fontweight="bold", pad=14)
+    ax.set_title(f"{name}  ({hoehe_m:.0f} m)", fontsize=19, fontweight="bold", pad=14)
 
     compass = {225: "SW", 270: "W", 292.5: "WNW", 315: "NW", 337.5: "NNW"}
     for az_c, label in compass.items():

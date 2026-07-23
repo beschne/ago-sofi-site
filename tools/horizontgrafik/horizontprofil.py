@@ -2,6 +2,7 @@
 kein Key noetig). Fuer jeden Azimut wird entlang eines Strahls in
 zunehmender Entfernung die groesste scheinbare Hoehe ueber dem Horizont
 gesucht (inkl. Erdkruemmung + Standardrefraktion)."""
+import sys
 import time
 
 import numpy as np
@@ -32,15 +33,24 @@ def fetch_elevations(points, dataset="srtm30m"):
     for i in range(0, len(points), 100):
         chunk = points[i : i + 100]
         locs = "|".join(f"{lat:.6f},{lon:.6f}" for lat, lon in chunk)
-        resp = requests.get(
-            f"https://api.opentopodata.org/v1/{dataset}", params={"locations": locs}, timeout=30
-        )
-        resp.raise_for_status()
+        for versuch in range(6):
+            resp = requests.get(
+                f"https://api.opentopodata.org/v1/{dataset}", params={"locations": locs}, timeout=30
+            )
+            if resp.status_code == 429:
+                wartezeit = 5 * (versuch + 1)
+                print(f"429 (Rate Limit) – warte {wartezeit}s ...", file=sys.stderr)
+                time.sleep(wartezeit)
+                continue
+            resp.raise_for_status()
+            break
+        else:
+            resp.raise_for_status()
         data = resp.json()
         for r in data["results"]:
             out.append(r["elevation"])
         if i + 100 < len(points):
-            time.sleep(1.1)
+            time.sleep(1.5)
     return out
 
 

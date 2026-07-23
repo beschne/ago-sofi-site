@@ -40,7 +40,7 @@ $activeNav = '';
 
 require __DIR__ . '/inc/header.php';
 ?>
-            <h1><?= htmlspecialchars($s['standortname']) ?></h1>
+            <h1><?= vor_ort_marker($s['zuletzt_vor_ort_geprueft']) ?><?= htmlspecialchars($s['standortname']) ?></h1>
             <p>
                 <?= status_badge($s['status']) ?>
                 <?php if (!$s['veroeffentlicht']): ?>

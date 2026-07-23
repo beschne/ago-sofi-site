@@ -1,6 +1,7 @@
 <?php
 require __DIR__ . '/../inc/db.php';
 require __DIR__ . '/../inc/csrf.php';
+require __DIR__ . '/../inc/helpers.php';
 csrf_token(); // Session-Cookie muss gesetzt sein, bevor unten HTML-Ausgabe beginnt
 
 $statusFilter = $_GET['status'] ?? '';
@@ -86,7 +87,7 @@ $alleStatus = ['Vorschlag', 'Zu prüfen', 'Vor Ort geprüft', 'Geeignet', 'Einge
         <tbody>
         <?php foreach ($standorte as $s): ?>
             <tr>
-                <td><?= htmlspecialchars($s['standortname']) ?></td>
+                <td><?= vor_ort_marker($s['zuletzt_vor_ort_geprueft']) ?><?= htmlspecialchars($s['standortname']) ?></td>
                 <td><?= htmlspecialchars($s['status']) ?></td>
                 <td><?= $s['veroeffentlicht'] ? 'Ja' : 'Nein' ?></td>
                 <td>

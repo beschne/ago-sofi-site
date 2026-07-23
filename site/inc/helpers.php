@@ -19,6 +19,21 @@ function status_badge(string $status): string {
     return '<span class="status-badge ' . $klasse . '">' . htmlspecialchars($status) . '</span>';
 }
 
+// Fernglas-Symbol: zeigt an, dass die AGO den Standort persönlich besichtigt hat
+// (zuletzt_vor_ort_geprueft gesetzt) — unabhängig vom aktuellen status, bewusst
+// kein Häkchen, damit es nicht als "geeignet" missverstanden wird.
+function vor_ort_marker(?string $zuletztVorOrtGeprueft): string {
+    if ($zuletztVorOrtGeprueft === null) {
+        return '';
+    }
+    $datum = htmlspecialchars(date('d.m.Y', strtotime($zuletztVorOrtGeprueft)));
+    return '<span class="vor-ort-marker" title="Vor Ort geprüft am ' . $datum . '">'
+        . '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
+        . '<circle cx="7" cy="16" r="3.2"></circle><circle cx="17" cy="16" r="3.2"></circle>'
+        . '<path d="M9.8 14.5 L8.5 8 h3l1 3M14.2 14.5 L15.5 8h-3l-1 3"></path><path d="M11.5 8h1"></path>'
+        . '</svg></span>';
+}
+
 const ANDRANG_BADGE_KLASSEN = [
     'Sehr gering' => 'andrang-sehr-gering',
     'Gering' => 'andrang-gering',
@@ -52,6 +67,7 @@ function koordinate_grad(float $wert, string $positiv, string $negativ): string 
 
 function standort_zeile(array $s): string {
     $name = htmlspecialchars($s['standortname']);
+    $marker = vor_ort_marker($s['zuletzt_vor_ort_geprueft'] ?? null);
     $badge = status_badge($s['status']);
     $andrangBadge = andrang_badge($s['andrang_erwartet'] ?? null) ?? '';
     $url = '/standort/' . htmlspecialchars($s['slug']);
@@ -74,7 +90,7 @@ function standort_zeile(array $s): string {
     return <<<HTML
     <details class="standort-zeile">
         <summary>
-            <span class="standort-name">{$name}</span>
+            <span>{$marker}<span class="standort-name">{$name}</span></span>
             {$badge}
             {$andrangBadge}
         </summary>

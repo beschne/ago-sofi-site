@@ -1,6 +1,6 @@
 <?php
 // Einfacher CSRF-Schutz für die Admin-Formulare (Basic-Auth via nginx schützt den
-// Zugriff auf /verwaltung/ generell, das hier schützt zusätzlich gegen Cross-Site-Requests).
+// Zugriff auf /admin/ generell, das hier schützt zusätzlich gegen Cross-Site-Requests).
 
 function csrf_token(): string {
     if (session_status() !== PHP_SESSION_ACTIVE) {

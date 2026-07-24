@@ -39,7 +39,7 @@ eigenes PHP/MySQL-Backend umgestellt. Airtable wird nicht mehr verwendet.
     ├── standort.php            (Detailseite, erreichbar unter /standort/<slug>)
     ├── beobachten.html
     ├── impressum-datenschutz.php
-    ├── verwaltung/                  (Basic-Auth-geschützte Datenpflege)
+    ├── admin/                       (Basic-Auth-geschützte Datenpflege)
     │   ├── index.php
     │   ├── edit.php
     │   ├── delete.php
@@ -65,7 +65,7 @@ Alles, was ausgeliefert werden soll, liegt unterhalb von `site/`. Dateien außer
 (README, CLAUDE.md, Deployment-Doku, `db/`-Skripte etc.) landen nie auf dem Webserver.
 
 **`site/uploads/` ist von `deploy.sh` per `--exclude` ausgenommen** (siehe DEPLOYMENT.md) —
-Fotos entstehen direkt auf dem Server über das Verwaltungsformular und dürfen von einem Deploy vom
+Fotos entstehen direkt auf dem Server über das Admin-Formular und dürfen von einem Deploy vom
 Mac aus nicht überschrieben/gelöscht werden.
 
 ## Seiten
@@ -87,7 +87,7 @@ Mac aus nicht überschrieben/gelöscht werden.
   Sitemap live aus der DB (alle Standorte mit `veroeffentlicht=1`, unabhängig vom Status) plus
   den statischen Seiten. Die Liste der statischen Seiten in der Datei ist von Hand gepflegt —
   eine neue statische Seite muss dort ergänzt werden, sonst fehlt sie in der Sitemap.
-  `robots.txt` sperrt `/verwaltung/` für Crawler (zusätzlich zur echten Absicherung per
+  `robots.txt` sperrt `/admin/` für Crawler (zusätzlich zur echten Absicherung per
   Basic-Auth) und verweist auf die Sitemap.
 
 ## Datenbank
@@ -103,10 +103,10 @@ Tabellen `standorte` und `standort_fotos` in der Datenbank `ago_sofi`, Schema in
   `api/standorte.php` konsistent bleiben):
   * "Geprüft": `veroeffentlicht = 1 AND status IN ('Geeignet', 'Eingeschränkt geeignet', 'Vor Ort geprüft')`
   * "Alle": keine Einschränkung.
-* **Verwaltungsoberfläche** (`site/verwaltung/`) für Anlegen/Bearbeiten/Löschen inkl. Foto-Upload,
+* **Admin-Oberfläche** (`site/admin/`) für Anlegen/Bearbeiten/Löschen inkl. Foto-Upload,
   geschützt durch nginx `auth_basic` (siehe DEPLOYMENT.md für Zugangsdaten-Verwaltung) plus
   CSRF-Token (`inc/csrf.php`) auf allen Formularen.
-* **Datenqualität** (`site/verwaltung/datenqualitaet.php`): rein lesende Übersichtsseite, prüft
+* **Datenqualität** (`site/admin/datenqualitaet.php`): rein lesende Übersichtsseite, prüft
   jeden Standort gegen sechs Kriterien und verlinkt Treffer direkt zu `edit.php?id=…` — kein
   Automatismus, der Inhalte ändert. Kriterien: (1) Horizontgrafik vorhanden, (2) Datum
   `zuletzt_vor_ort_geprueft` gesetzt (hartes Kriterium nur bei Status "Geeignet", bei

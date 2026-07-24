@@ -10,7 +10,7 @@ Veröffentlicht unter https://sofi.agorion.de.
 ## Tech-Stack
 
 HTML5, CSS, Vanilla JavaScript, PHP (Server-Templating, kein Framework) und MySQL/MariaDB.
-Standortdaten liegen in einer eigenen Datenbank und werden über `site/verwaltung/` gepflegt
+Standortdaten liegen in einer eigenen Datenbank und werden über `site/admin/` gepflegt
 (nicht mehr über Airtable).
 
 ## Entwicklung

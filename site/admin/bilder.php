@@ -107,7 +107,7 @@ $standorteFuerFilter = $pdo->query('SELECT id, standortname FROM standorte ORDER
 <head>
     <meta charset="UTF-8">
     <title>Bilder verwalten – Admin</title>
-    <link rel="stylesheet" href="verwaltung.css">
+    <link rel="stylesheet" href="admin.css">
 </head>
 <body>
 <div class="admin-wrap">

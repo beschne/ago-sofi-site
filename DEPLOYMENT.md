@@ -109,7 +109,7 @@ ankommen, müssen zwei unabhängige Limits mindestens so hoch gesetzt sein:
 
 ### 8. Verwaltungs-Zugangsschutz (HTTP Basic Auth)
 
-`/verwaltung/` ist über nginx `auth_basic` geschützt (nicht `.htaccess` — der Server nutzt nginx,
+`/admin/` ist über nginx `auth_basic` geschützt (nicht `.htaccess` — der Server nutzt nginx,
 das liest keine `.htaccess`-Dateien). Neuen Nutzer anlegen/Passwort ändern:
 
 ```bash

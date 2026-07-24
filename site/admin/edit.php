@@ -282,7 +282,7 @@ function feld(?array $daten, string $name, $fallback = ''): string {
 <head>
     <meta charset="UTF-8">
     <title><?= $id ? 'Standort bearbeiten' : 'Neuer Standort' ?> – Admin</title>
-    <link rel="stylesheet" href="verwaltung.css">
+    <link rel="stylesheet" href="admin.css">
 </head>
 <body>
 <div class="admin-wrap">

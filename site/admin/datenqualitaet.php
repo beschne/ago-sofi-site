@@ -153,7 +153,7 @@ function dq_tabelle(array $zeilenHtml): string {
 <head>
     <meta charset="UTF-8">
     <title>Datenqualität – Admin</title>
-    <link rel="stylesheet" href="verwaltung.css">
+    <link rel="stylesheet" href="admin.css">
 </head>
 <body>
 <div class="admin-wrap">

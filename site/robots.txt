@@ -1,4 +1,4 @@
 User-agent: *
-Disallow: /verwaltung/
+Disallow: /admin/
 
 Sitemap: https://sofi.agorion.de/sitemap.xml

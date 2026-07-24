@@ -35,7 +35,7 @@ $alleStatus = ['Vorschlag', 'Zu prüfen', 'Vor Ort geprüft', 'Geeignet', 'Einge
 <head>
     <meta charset="UTF-8">
     <title>Standorte verwalten – Admin</title>
-    <link rel="stylesheet" href="verwaltung.css">
+    <link rel="stylesheet" href="admin.css">
 </head>
 <body>
 <div class="admin-wrap">

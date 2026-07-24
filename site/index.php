@@ -8,7 +8,7 @@ $activeNav = 'geprueft';
 $pdo = ago_sofi_db();
 $stmt = $pdo->prepare(
     "SELECT * FROM standorte
-     WHERE veroeffentlicht = 1 AND status IN ('Geeignet', 'Eingeschränkt geeignet', 'Vor Ort geprüft')
+     WHERE veroeffentlicht = 1 AND status IN ('Geeignet', 'Eingeschränkt geeignet')
      ORDER BY " . STATUS_SORT_SQL . ", standortname"
 );
 $stmt->execute();

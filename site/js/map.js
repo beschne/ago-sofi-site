@@ -4,7 +4,7 @@
 var STATUS_MARKER_FARBEN = {
     "Vorschlag": { rand: "#0b6577", flaeche: "#3ddfff" },
     "Zu prüfen": { rand: "#14527e", flaeche: "#3dafff" },
-    "Vor Ort geprüft": { rand: "#106354", flaeche: "#3dffdc" },
+    "In Prüfung vor Ort": { rand: "#106354", flaeche: "#3dffdc" },
     "Geeignet": { rand: "#2c6b23", flaeche: "#55ff3d" },
     "Eingeschränkt geeignet": { rand: "#7a5d05", flaeche: "#ffcf3d" },
     "Ungeeignet": { rand: "#8a3c11", flaeche: "#ff823d" },

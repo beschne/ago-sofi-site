@@ -28,7 +28,7 @@ $stmt = $pdo->prepare($sql);
 $stmt->execute($parameter);
 $standorte = $stmt->fetchAll();
 
-$alleStatus = ['Vorschlag', 'Zu prüfen', 'Vor Ort geprüft', 'Geeignet', 'Eingeschränkt geeignet', 'Ungeeignet', 'Nicht mehr verfügbar'];
+$alleStatus = ['Vorschlag', 'Zu prüfen', 'In Prüfung vor Ort', 'Geeignet', 'Eingeschränkt geeignet', 'Ungeeignet', 'Nicht mehr verfügbar'];
 ?>
 <!DOCTYPE html>
 <html lang="de">

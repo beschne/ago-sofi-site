@@ -70,8 +70,8 @@ Mac aus nicht überschrieben/gelöscht werden.
 
 ## Seiten
 
-* **index.php** — Startseite: kurze Einführung, Leaflet-Karte mit Markern nur für geprüfte
-  Standorte (Status Geeignet, Eingeschränkt geeignet, Vor Ort geprüft), aufklappbare Liste
+* **index.php** — Startseite: kurze Einführung, Leaflet-Karte mit Markern nur für geprüfte/
+  empfohlene Standorte (Status Geeignet, Eingeschränkt geeignet), aufklappbare Liste
   derselben Standorte, Link zu `alle-standorte.php`.
 * **alle-standorte.php** — eigene Leaflet-Karte mit Markern für alle gemeldeten Standorte,
   plus aufklappbare Liste aller gemeldeten Standorte inkl. Status-Badge, unabhängig vom
@@ -101,7 +101,9 @@ Tabellen `standorte` und `standort_fotos` in der Datenbank `ago_sofi`, Schema in
   `AGO_SOFI_DB_CONFIG` für lokale Entwicklung möglich).
 * **Öffentliche Filterlogik** (muss zwischen `index.php`, `alle-standorte.php` und
   `api/standorte.php` konsistent bleiben):
-  * "Geprüft": `veroeffentlicht = 1 AND status IN ('Geeignet', 'Eingeschränkt geeignet', 'Vor Ort geprüft')`
+  * "Geprüft"/empfohlen: `veroeffentlicht = 1 AND status IN ('Geeignet', 'Eingeschränkt geeignet')`.
+    Status "In Prüfung vor Ort" zählt bewusst nicht dazu — der Standort wurde zwar schon
+    besichtigt, aber noch nicht final bewertet (kein Geeignet/Eingeschränkt-geeignet-Urteil).
   * "Alle": keine Einschränkung.
 * **Admin-Oberfläche** (`site/admin/`) für Anlegen/Bearbeiten/Löschen inkl. Foto-Upload,
   geschützt durch nginx `auth_basic` (siehe DEPLOYMENT.md für Zugangsdaten-Verwaltung) plus

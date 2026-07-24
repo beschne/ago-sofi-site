@@ -2,12 +2,12 @@
 // Gemeinsame Anzeige-Helfer für die Standort-Listen (index.php, alle-standorte.php).
 
 // SQL-Fragment für ORDER BY: sortiert Standorte nach Eignung (beste zuerst).
-const STATUS_SORT_SQL = "FIELD(status, 'Geeignet', 'Vor Ort geprüft', 'Eingeschränkt geeignet', 'Zu prüfen', 'Vorschlag', 'Ungeeignet', 'Nicht mehr verfügbar')";
+const STATUS_SORT_SQL = "FIELD(status, 'Geeignet', 'Eingeschränkt geeignet', 'In Prüfung vor Ort', 'Zu prüfen', 'Vorschlag', 'Ungeeignet', 'Nicht mehr verfügbar')";
 
 const STATUS_BADGE_KLASSEN = [
     'Vorschlag' => 'badge-vorschlag',
     'Zu prüfen' => 'badge-pruefen',
-    'Vor Ort geprüft' => 'badge-vorort',
+    'In Prüfung vor Ort' => 'badge-vorort',
     'Geeignet' => 'badge-geeignet',
     'Eingeschränkt geeignet' => 'badge-eingeschraenkt',
     'Ungeeignet' => 'badge-ungeeignet',

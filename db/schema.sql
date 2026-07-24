@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS standorte (
     status ENUM(
         'Vorschlag',
         'Zu prüfen',
-        'Vor Ort geprüft',
+        'In Prüfung vor Ort',
         'Geeignet',
         'Eingeschränkt geeignet',
         'Ungeeignet',

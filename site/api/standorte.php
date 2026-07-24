@@ -7,7 +7,7 @@ require __DIR__ . '/../inc/db.php';
 
 header('Content-Type: application/json; charset=utf-8');
 
-const GEPRUEFT_STATUS = ['Geeignet', 'Eingeschränkt geeignet', 'Vor Ort geprüft'];
+const GEPRUEFT_STATUS = ['Geeignet', 'Eingeschränkt geeignet'];
 
 $filter = $_GET['filter'] ?? 'alle';
 

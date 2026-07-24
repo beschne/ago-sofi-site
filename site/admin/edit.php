@@ -6,7 +6,7 @@ require __DIR__ . '/../inc/upload.php';
 csrf_token(); // Session-Cookie muss gesetzt sein, bevor unten HTML-Ausgabe beginnt
 
 $pdo = ago_sofi_db();
-$alleStatus = ['Vorschlag', 'Zu prüfen', 'Vor Ort geprüft', 'Geeignet', 'Eingeschränkt geeignet', 'Ungeeignet', 'Nicht mehr verfügbar'];
+$alleStatus = ['Vorschlag', 'Zu prüfen', 'In Prüfung vor Ort', 'Geeignet', 'Eingeschränkt geeignet', 'Ungeeignet', 'Nicht mehr verfügbar'];
 $fotoKategorien = [
     'horizontfoto' => 'Horizontfoto',
     'panorama' => 'Panorama',

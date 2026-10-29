@@ -4,8 +4,9 @@ Die Website wird **direkt vom lokalen Mac aus per rsync** auf den Server ausgero
 Es liegt kein Git-Checkout auf dem Server — nur der Inhalt von `site/` landet dort,
 unter `/var/www/sofi.agorion.de`.
 
-* Server: `92.205.236.81` (reverse DNS: `81.236.205.92.host.secureserver.net`)
-* SSH-User: `cerberus`
+* Server: derselbe wie kalender.agorion.de, angesprochen über den SSH-Alias `ago-server`
+* SSH-User: `cerberus`, nur Login per Key `~/.ssh/ago-sofi-deploy` (Passwort-Login ist seit
+  29.10.2026 aus)
 * Zielverzeichnis: `/var/www/sofi.agorion.de` (entspricht 1:1 dem Inhalt von `site/`)
 * nginx-`root` zeigt direkt auf dieses Verzeichnis
 
@@ -21,6 +22,20 @@ ssh-keygen -t ed25519 -f ~/.ssh/ago-sofi-deploy -N "" -C "deploy@sofi.agorion.de
 
 Der öffentliche Schlüssel liegt in `~/.ssh/ago-sofi-deploy.pub` auf dem Mac und ist als
 einziger Eintrag in `~/.ssh/authorized_keys` von `cerberus` auf dem Server hinterlegt.
+
+Alle Skripte und Befehle hier nutzen den Alias `ago-server`. Einmalig in `~/.ssh/config`:
+
+```text
+Host ago-server
+  HostName sofi.agorion.de
+  User cerberus
+  IdentityFile ~/.ssh/ago-sofi-deploy
+  IdentitiesOnly yes
+```
+
+`HostName` kann auch die IP-Adresse des Servers sein (Domain-Factory-Kundenmenü). Test:
+`ssh ago-server 'echo ok'`. Ohne Key gibt es keinen Zugang mehr; im Notfall hilft die
+Konsole im Kundenmenü.
 
 ### 2. Zielverzeichnis auf dem Server
 
@@ -42,14 +57,14 @@ Certbot-Zertifikatserneuerung mit Anpassungen, oder manuell), muss diese Datei i
 entsprechend nachgezogen werden — und umgekehrt: Änderungen hier werden per
 
 ```bash
-scp deploy/nginx/sofi.agorion.de.conf cerberus@92.205.236.81:/tmp/sofi.agorion.de.conf
-ssh cerberus@92.205.236.81 'sudo mv /tmp/sofi.agorion.de.conf /etc/nginx/sites-available/sofi.agorion.de && sudo chown root:root /etc/nginx/sites-available/sofi.agorion.de && sudo nginx -t && sudo systemctl reload nginx'
+scp deploy/nginx/sofi.agorion.de.conf ago-server:/tmp/sofi.agorion.de.conf
+ssh ago-server 'sudo mv /tmp/sofi.agorion.de.conf /etc/nginx/sites-available/sofi.agorion.de && sudo chown root:root /etc/nginx/sites-available/sofi.agorion.de && sudo nginx -t && sudo systemctl reload nginx'
 ```
 
 auf den Server übertragen. Aktivierung erfolgte einmalig über:
 
 ```bash
-ssh cerberus@92.205.236.81 'sudo ln -sf /etc/nginx/sites-available/sofi.agorion.de /etc/nginx/sites-enabled/sofi.agorion.de'
+ssh ago-server 'sudo ln -sf /etc/nginx/sites-available/sofi.agorion.de /etc/nginx/sites-enabled/sofi.agorion.de'
 ```
 
 ### 4. TLS-Zertifikat (Let's Encrypt / Certbot)
@@ -57,7 +72,7 @@ ssh cerberus@92.205.236.81 'sudo ln -sf /etc/nginx/sites-available/sofi.agorion.
 Einmalig eingerichtet, analog zu den anderen Subdomains auf diesem Server:
 
 ```bash
-ssh cerberus@92.205.236.81 'sudo certbot --nginx -d sofi.agorion.de --non-interactive --agree-tos -m benno.schneider@gmail.com --redirect'
+ssh ago-server 'sudo certbot --nginx -d sofi.agorion.de --non-interactive --agree-tos -m benno.schneider@gmail.com --redirect'
 ```
 
 Certbot erneuert das Zertifikat automatisch per systemd-Timer im Hintergrund.
@@ -68,9 +83,9 @@ Seit der Umstellung von Airtable auf ein eigenes Backend läuft eine eigene Date
 demselben MariaDB-Server, der auch eine andere WordPress-Seite auf diesem Server bedient:
 
 ```bash
-ssh cerberus@92.205.236.81 "sudo mysql -e \"CREATE DATABASE IF NOT EXISTS ago_sofi CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci; CREATE USER IF NOT EXISTS 'ago_sofi'@'localhost' IDENTIFIED BY '<passwort>'; GRANT ALL PRIVILEGES ON ago_sofi.* TO 'ago_sofi'@'localhost'; FLUSH PRIVILEGES;\""
-scp db/schema.sql db/seed-migration.sql cerberus@92.205.236.81:/tmp/
-ssh cerberus@92.205.236.81 'sudo mysql ago_sofi < /tmp/schema.sql && sudo mysql ago_sofi < /tmp/seed-migration.sql && rm /tmp/schema.sql /tmp/seed-migration.sql'
+ssh ago-server "sudo mysql -e \"CREATE DATABASE IF NOT EXISTS ago_sofi CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci; CREATE USER IF NOT EXISTS 'ago_sofi'@'localhost' IDENTIFIED BY '<passwort>'; GRANT ALL PRIVILEGES ON ago_sofi.* TO 'ago_sofi'@'localhost'; FLUSH PRIVILEGES;\""
+scp db/schema.sql db/seed-migration.sql ago-server:/tmp/
+ssh ago-server 'sudo mysql ago_sofi < /tmp/schema.sql && sudo mysql ago_sofi < /tmp/seed-migration.sql && rm /tmp/schema.sql /tmp/seed-migration.sql'
 ```
 
 Zugangsdaten liegen **außerhalb** des Webroots und außerhalb des Git-Repos unter
@@ -80,7 +95,7 @@ Zugangsdaten liegen **außerhalb** des Webroots und außerhalb des Git-Repos unt
 ### 6. Upload-Verzeichnis für Fotos
 
 ```bash
-ssh cerberus@92.205.236.81 'sudo mkdir -p /var/www/sofi.agorion.de/uploads && sudo chown www-data:www-data /var/www/sofi.agorion.de/uploads && sudo chmod 755 /var/www/sofi.agorion.de/uploads'
+ssh ago-server 'sudo mkdir -p /var/www/sofi.agorion.de/uploads && sudo chown www-data:www-data /var/www/sofi.agorion.de/uploads && sudo chmod 755 /var/www/sofi.agorion.de/uploads'
 ```
 
 Wichtig: `www-data` (nicht `cerberus`), da PHP-FPM als `www-data` läuft und dorthin
@@ -101,7 +116,7 @@ ankommen, müssen zwei unabhängige Limits mindestens so hoch gesetzt sein:
   und `post_max_size = 8M`. Ubuntus Standard für `upload_max_filesize` ist nur 2 MB — das
   wurde einmalig angehoben:
   ```bash
-  ssh cerberus@92.205.236.81 "sudo sed -i 's/^upload_max_filesize = .*/upload_max_filesize = 8M/' /etc/php/8.2/fpm/php.ini && sudo systemctl reload php8.2-fpm"
+  ssh ago-server "sudo sed -i 's/^upload_max_filesize = .*/upload_max_filesize = 8M/' /etc/php/8.2/fpm/php.ini && sudo systemctl reload php8.2-fpm"
   ```
   Reine Erhöhung eines gemeinsamen Werts (erlaubt größere Uploads für alle Seiten auf dem
   Pool, schränkt nichts ein) — bewusst so entschieden statt eines eigenen FPM-Pools nur für
@@ -110,14 +125,18 @@ ankommen, müssen zwei unabhängige Limits mindestens so hoch gesetzt sein:
 ### 8. Verwaltungs-Zugangsschutz (HTTP Basic Auth)
 
 `/admin/` ist über nginx `auth_basic` geschützt (nicht `.htaccess` — der Server nutzt nginx,
-das liest keine `.htaccess`-Dateien). Neuen Nutzer anlegen/Passwort ändern:
+das liest keine `.htaccess`-Dateien). Neuen Nutzer anlegen/Passwort ändern, mit bcrypt (`-B`)
+und interaktiv abgefragtem Passwort, damit es nicht in der Shell-History landet (`htpasswd`
+stammt aus `apache2-utils`, ist auf dem Server installiert):
 
 ```bash
-ssh cerberus@92.205.236.81 'HASH=$(openssl passwd -apr1 "<neues-passwort>"); echo "<benutzername>:$HASH" | sudo tee /etc/nginx/.htpasswd-sofi-admin > /dev/null && sudo chmod 640 /etc/nginx/.htpasswd-sofi-admin && sudo chown root:www-data /etc/nginx/.htpasswd-sofi-admin'
+ssh -t ago-server 'sudo htpasswd -B -C 12 /etc/nginx/.htpasswd-sofi-admin <benutzername> && sudo chmod 640 /etc/nginx/.htpasswd-sofi-admin && sudo chown root:www-data /etc/nginx/.htpasswd-sofi-admin'
 ```
 
-Für mehrere Zeilen (mehrere Nutzer) die Datei entsprechend mit mehreren `benutzer:hash`-Zeilen
-befüllen. Die Datei liegt außerhalb des Webroots, ist nicht Teil des Deploys.
+`htpasswd` ändert nur die Zeile dieses Nutzers; weitere Nutzer mit demselben Befehl und
+anderem Namen eintragen, entfernen mit `sudo htpasswd -D … <benutzername>`. Die Datei liegt
+außerhalb des Webroots, ist nicht Teil des Deploys. Fehlgeschlagene Anmeldungen sperrt
+fail2ban über das Jail `nginx-http-auth`.
 
 ## Deploy-Ablauf (nach jeder Änderung)
 
@@ -167,7 +186,7 @@ kopieren); auf Wunsch kann das ebenfalls als Skript ergänzt werden.
 Für PHP-Änderungen lokal testen, ohne eine eigene MySQL-Installation zu brauchen:
 
 ```bash
-ssh -f -N -L 13306:127.0.0.1:3306 -i ~/.ssh/ago-sofi-deploy cerberus@92.205.236.81
+ssh -f -N -L 13306:127.0.0.1:3306 ago-server
 ```
 
 Dann `site/inc/db.php` per Umgebungsvariable `AGO_SOFI_DB_CONFIG` auf eine lokale Config

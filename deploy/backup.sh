@@ -4,8 +4,7 @@
 # Aufruf: ./deploy/backup.sh
 set -euo pipefail
 
-REMOTE_HOST="cerberus@92.205.236.81"
-SSH_KEY="$HOME/.ssh/ago-sofi-deploy"
+REMOTE_HOST="ago-server"   # SSH-Alias aus ~/.ssh/config (Server, Benutzer, Key), siehe DEPLOYMENT.md
 REMOTE_UPLOADS="/var/www/sofi.agorion.de/uploads"
 ZIEL_DIR="$HOME/Desktop"
 
@@ -16,12 +15,12 @@ trap 'rm -rf "$ARBEITSVERZEICHNIS"' EXIT
 mkdir -p "$ZIEL_DIR"
 
 echo "1/3 Datenbank-Dump erstellen..."
-ssh -i "$SSH_KEY" -o IdentitiesOnly=yes "$REMOTE_HOST" \
+ssh "$REMOTE_HOST" \
     'sudo -n mysqldump --single-transaction ago_sofi' > "$ARBEITSVERZEICHNIS/ago_sofi.sql"
 
 echo "2/3 Fotos herunterladen..."
 mkdir -p "$ARBEITSVERZEICHNIS/uploads"
-rsync -az -e "ssh -i $SSH_KEY -o IdentitiesOnly=yes" \
+rsync -az \
     "$REMOTE_HOST:$REMOTE_UPLOADS/" "$ARBEITSVERZEICHNIS/uploads/"
 
 echo "3/3 ZIP erstellen..."
